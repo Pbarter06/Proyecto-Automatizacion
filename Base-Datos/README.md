@@ -1,0 +1,1 @@
+En esta carpeta van los archivos de SQL para las bases de datos y un documento con las consultas 

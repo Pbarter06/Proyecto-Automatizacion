@@ -1,0 +1,1 @@
+En esta carpeta irán los códigos necesarios para programar la ESP32-S3
