@@ -2,16 +2,16 @@
 
 **PR2-2-6**
 
-#Integrantes del grupo
+## Integrantes del grupo
 - Finn Alai Perea Oltmann
 - Claudia Moreno Martínez
 - Ainhoa López Gómez
 - Paula Barona Terol
 
-  ##1.¿En qué consiste la propuesta de automatización?
+  ## 1.¿En qué consiste la propuesta de automatización?
    Esta propuesta de automatización se centra en el control de calidad, empaquetado y paletizado de azulejos. El objetivo de la automatización es la mejora en la calidad del producto,
 
-  ##2. Elementos que participan en la celda de automatización
+  ## 2. Elementos que participan en la celda de automatización
   Para llevar a cabo la propuesta de automatización, la celda de trabajo integra diferentes componentes:
     - **Sistema de Visión Artificial** (`Cámara Motrix Iris GTR`): Actúa como sensor principal del control de calidad. Se sitúa sobre la primera cinta transportadora y es la encargada de analizar y determinar en qué estado se encuentra el azulejo. No obstante, debido a las circustancias del proyecto, no es posible la programación e implementación de este elemento para su demostración, por lo que será sustituído por un sistema embebido (ESP32-S3). De esta manera, el operario contará con 3 botones -uno por cada estado posible del azulejo- y una vez pulsado, esta información se enviará a través de un broker de comunicación (MQTT) a la aplicación Python, quien mandará ejecutar las tareas correspondientes a las unidades robóticas.
     - **Unidades Robóticas** : En cuanto a las unidades robóticas, esta propuesta busca implementar dos robots cooperativos.
@@ -31,5 +31,5 @@
   - **Azulejos** : Se ha optado por producir azulejos con tamaño estándar para la industria (180 mm x 140 mm), ya que se trata de uno de los tamaños más solicitados por los clientes.
   - **Palets** : Para el transporte de los azulejos se han implementado 2 palets (para azulejos en buen estado y para azulejos de segunda venta) de mismo tamaño (800 mm x 800 mm). Este tamaño permite a la empresa paletizar un total de 6 cajas (apilables a 3 alturas).
 
-  ##3. Arquitectura de Comunicaciones
+  ## 3. Arquitectura de Comunicaciones
   Un pilar fundamental de esta propuesta de automatización es la coordinación entre los diferentes elementos de la planta. Para un buen funcionamiento, el sistema cuenta con una comunicación bidireccional en tiempo real a través de la arquitectura basada en el protocolo MQTT. Por un lado, la ESP32-S3 publica (`publish`) datos hacia el servidor indicando eventos del proceso productivo (como la detección de un tipo de azulejo o la notificación de retirada de un palet). Por otro lado, la placa se suscribe (`suscribe`) a topics del sistema para recibir órdenes externas que le permiten encender indicadores LED.
