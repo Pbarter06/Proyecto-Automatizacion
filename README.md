@@ -8,8 +8,14 @@
 - Ainhoa López Gómez
 - Paula Barona Terol
 
-  ## 1.¿En qué consiste la propuesta de automatización?
-   Esta propuesta de automatización se centra en el control de calidad, empaquetado y paletizado de azulejos. El objetivo de la automatización es la mejora en la calidad del producto,
+  ## 1. ¿En qué consiste la propuesta de automatización?
+   Esta propuesta de automatización se centra en el control de calidad, empaquetado y paletizado de azulejos. El objetivo principal de la automatización es optimizar la línea de producción dividendo el flujo de trabajo en 2 procesos:
+  - **Fase 1. Control de Calidad y Empaquetado** : Los azulejos se desplazan por una cinta mecánica donde un sistema de visión artificial se encargará de inspeccionar el estado del azulejo. Dependiendo del estado, la unidad robótica correspondiente se encargará de acercarse a la posición de pick y descargar el azulejo en la posición de place correspondiente.
+  - Tipos de Azulejos:
+    - Buen estado: No presenta ningún defecto en su diseño, por lo que se depositará en las cajas correspondientes a este estado para una venta de primera calidad.
+    - Defectuoso: Presenta algún defecto en su diseño o dorma, por lo que se depositará en las cajas correspondientes a este estado para una venta de segunda calidad con un precio reducido al incial.
+    - Roto: El robot no recoge el azulejo, éste se sigue desplazando por la cinta mecánica hasta caer en la basura.
+  - **Fase 2. Paletizado de las cajas** : Una vez que las cajas de la fase anterior se llenan, una segunda cinta mecánica las traslada a la zona de paletizado. Allí, una segunda unidad robótica identifica el tipo de caja y la apila de forma ordenada en su palet correspondiente, dejándolo listo para su retirada y distribución.
 
   ## 2. Elementos que participan en la celda de automatización
   Para llevar a cabo la propuesta de automatización, la celda de trabajo integra diferentes componentes:
