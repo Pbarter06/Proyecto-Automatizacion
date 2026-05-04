@@ -59,18 +59,13 @@ Este fichero contiene las funciones que getsionan:
 - Recepción de mensajes.
 - Envío de mensajes.
   
-  ### Función 1:
+  ### void suscribirseATopics() 
     ```cpp
-    void suscribirseATopics(){
     mqtt_subscribe(HELLO_TOPIC);
-    }
     ```
     Esta función se llama al iniciar la conexión MQTT. A continuación se suscribe la ESP32-S3 al topic `HELLO_TOPIC` . Además, permite a parte de enviar mensajes, recibirlos a través de ese canal.
 
-  ### Función 2:
-    ```cpp
-    void alRecibirMensajePorTopic(char* topic, String incomingMessage){
-    ```
+  ### void alRecibirMensajePorTopic()
     Esta función tiene el rol de controlador que gestiona la recepción de datos. Asimosmo, para que pueda llevar a cabo esta tarea recibe el nombre del topic por el que va a recibir un mensaje y, por último, recibe un mensaje en formato `string`.
 
   ```cpp
@@ -246,6 +241,104 @@ Primeramente, se define un identificador único del dispositivo. Se usa para reg
 Como se puede observar, dentro de la función loop() se realiza el mantenimiento de la conexión WiFi, MQTT y las tareas periódicas que se llevan a cabo en la función `on_loop()`.
 
 ## mqtt_lib.ino
+La función de este fichero es establecer la conexión con el broker MQTT, mantener la conexión activa, en caso de que la conexión WiFi se pierda reconectar, publicar mensajes, suscribirse a topics para procesar los mensajes entrantes mediante un callback.
+```cpp
+#define MQTT_CONECTION_RETRIES 3
+PubSubClient(espWifiClient);
+```
+Primeramente, se deben definir todos aquellos parámetros iniciales y clientes de MQTT. En este caso, de define el número máximo de intentos de reconexión antes de finalizar la conexión. Luego, se crea un cliente MQTT usando el cliente WiFi (`espWifiClient`) definido en el fichero `wifi_lib.ino`. Este objeto es el que realmente se comunica con el broker.
+
+```cpp
+const char* mqttServerIP = MQTT_SERVER_IP;
+unsigned int mqttServerPort = MQTT_SERVER:PORT;
+String mqttClientID;
+```
+Continuando con los parámetros iniciales, en este apartado se carga los parámetros definidos en `Config.h` (IP del broker, puerto y ID del cliente el cual se asignará en `mqtt_connect()`).
+
+### void mqtt_loop()
+  ```cpp
+  if(!mqttClient.connected()){
+    mqtt_reconnect(MQTT_CONNECTION_RETRIES);
+    suscribirseATopics();
+  }
+  mqttClient.loop();
+  ```
+  Esta función se ejecuta en cada iteración del loop principal. Principalmente esta función realiza 2 tareas:
+    1. Comprueba si el cliente MQTT está conectado: si se detecta que el cliente MQTT no está conectado se llama a `mqtt_reconnect()` y vuelve a suscribirse a los topics.
+    2. Llama a `mqttClient.loop()`: en esta fase se procesa mensajes entrantes y mantiene activa la conexión. En el caso de esta función es imprescindible llamarla de manera continua.
+    
+### void mqtt_connect(String clientID)
+  En un primer instante, esta función recibe como parámetro el ID del dispositivo desde `main.ino`. Se busca llevar a cabo la configuración del cliente y intentar mantener la conexión.
+
+  ```cpp
+  mqttClientID = String(clientID);
+  mqttClient.setServer(mqttServerIP, mqttServerPort);
+  mqttClient.setCallback(mqttCallback);
+  ```
+  En este bloque de código se realiza la configuración del cliente. Aquí se almacena el ID del cliente, se configura la IP y puerto del broker MQTT. Y también, se registra la función `mqttCallback()` como manejador de mensajes entrantes.
+
+  ```cpp
+  mqtt_reconnect(MQTT_CONNECTION_RETRIES);
+  ```
+  Cuando se ejecuta esta línea de código se llama a la función que realmente intenta conectar.
+
+### void mqtt_reconnect(int retries)
+  Esta función intenta garantizar la reconexión al broker hasta un máximo de `retries`.
+
+  ```cpp
+  if ( !WiFi.isConnected() )
+    return;
+  if ( !mqttClient.connected() )
+    warnln("Disconnected from the MQTT broker");
+  ```
+  El primer paso a seguir en esta función es comprobar que haya conexión a WiFI. Si no hay conexión no se intenta conectar con el broker MQTT. En el caso de que ocurra esta situación, se enviará un mensaje de aviso informando que se el dispositivo se encuentra en estado de desconexión. Posterior a imprimir por pantalla el aviso, se encuentra un bucle que se repite hasta que se consiga reconectar con la red WiFi o, en caso de no obtener éxtito, cerrar el programa porque se han agotado los intentos de reconexión.
+
+    ```cpp
+    #ifdef MQTT_USERNAME
+      if ( mqttClient.connect(mqttClientID.c_str(), MQTT_USERNAME, MQTT_PASSWORD) ) {
+    #else
+      if ( mqttClient.connect(mqttClientID.c_str()) ) {
+    #endif
+    ```
+  Una vez llegado a esta sección de código, se realiza un intento de conexión. Si existe un usuario con contraseña el sistema los utiliza. En el caso contrario se busca conectar sin la autenticación.
+  Cuando se realiza una conexión exitosa se espera 1 segundo para estabilizar esta. No obstante, si falla se muestra el código error gracias a la gestión de errores que se implementa y se realiza una espera de 5 segundos antes de reintentar la conexión.
+
+### void mqttCallBack(char* topic, byte* message, unsigned int length)
+  Esta función se ejecuta automáticamente cuando llega un mensaje MQTT.
+
+  ```cpp
+  String incomingMessage;
+  for (int i = 0; i < length; i++) {
+    incomingMessage += (char)message[i];
+  }
+  ```
+  El primer paso que lleva a cabo esta función es la conversión del mensaje a `String`. MQTT entrega los datos como un array de bytes que se convierten a texto.
+  
+  ```cpp
+  alRecibirMensajePorTopic(topic, incomingMessage);
+  ```
+  Más tarde, se llama a la función definida en `comunicaciones.ino` que parse el objeto JSON, interpreta comandos y principalmente, controla el LED.
+
+### void mqtt_publish(const char* topic, String outgoingMessage)
+  Esta función tiene como objetivo principal la publicación de los mensajes.
+
+  ```cpp
+  if ( !mqttClient.connected() ) {
+    errorln("Cannot send message ... MQTT Client is disconnected!!")
+    return;
+  }
+  ```
+  El primer paso a realizar es comprobar la conexión. Luego, se trata con el loggin y su posterior publicación a través de `mqttClient.publish(topic, outgoingMessage.c_str())` que envía el mensaje al broker.
+
+### void mqtt_suscribe(const char* topic)
+  Esta función es la que permite la suscripción a los topics correspondientes. Al igual que en los casos anteriores, el primer paso que se realiza es la comprobación de la conexión.
+
+  ```cpp
+  trace("Subscribed to topic: ");
+  traceln(topic);
+  mqttClient.subscribe(topic);
+  ```
+  Por último, se realiza el loggin y la suscripción a los topics.
 
 ## setup.ino
 La finalidad de este fichero es inicializar los recursos de la ESP32-S3 y enviar un mensaje inicial al broker MQTT para confirmar que el dispositivo está operativo.
