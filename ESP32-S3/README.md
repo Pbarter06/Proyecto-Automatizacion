@@ -41,10 +41,10 @@ Este fichero contiene las funciones que getsionan:
   ```
   A través de estas líneas de código se busca extraer valores del objeto JSON recibido. Luego, estos valores son impresos por pantalla.
 
-```cpp
-if(strcmp(topic, HELLO_TOPIC) == 0) {
-```
-  Por último, si se recibe el mensaje se procede a la gestión del topic `HELLO_TOPIC`. De manera que lo primero a llevar a cabo es la comprobación de si el mensaje pertenece al topic esperado. Si es así, entonces dependiendo del mensaje recibido (`on`/ `off`) se mostrará por pantalla el estado del led interno.
+  ```cpp
+  if(strcmp(topic, HELLO_TOPIC) == 0) {
+  ```
+    Por último, si se recibe el mensaje se procede a la gestión del topic `HELLO_TOPIC`. De manera que lo primero a llevar a cabo es la comprobación de si el mensaje pertenece al topic esperado. Si es así, entonces dependiendo del mensaje recibido (`on`/ `off`) se mostrará por pantalla el estado del led interno.
 
   ### Función 3:
   ```cpp
