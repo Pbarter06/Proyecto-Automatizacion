@@ -55,6 +55,44 @@ Este fichero contiene las funciones que getsionan:
   Esta última función del fichero es la encargada de publicar un mensaje a través de un canal MQTT. Su funcionamiento es el inverso a la primera función que se ha analizado; convierte el `String` a `const char*` para la librería MQTT.
   
 ## funciones.ino
+Este fichero agrupa funciones auxiliares. Su propósito principal es getsionar el estado del LED interno de la ESP32-S3m actuando como un pequeño módulo de control de actuadores.
+
+```cpp
+uint8_t ledStatus = 0;
+```
+Lo primer a realizar es declarar una variable global (entero sin signo de 8 bits) que almacene el estado actual del LED interno, de manera que :
+- `0` : apagado
+- `1` : encendido
+
+  ### setInternalLed(uint8_t status)
+    Esta función busca controlar el LED interno de la ESP32-S3. Recibe como parámetro el estado deseado y actualiza el hardware.
+  
+    ```cpp
+    if(ledStatus == status)
+      return;
+    ```
+    Si el LED ya está en el estaod slicitado, la función termina inmediatamente. Esta condición evita llamadas innecesarias a `digitalWrite()`.
+
+    ```cpp
+    ledStatus = status;
+    ```
+    Actualiza la variable global para reflejar y guardar el nuevo estado del LED.
+
+    ```cpp
+    if(status){
+      infoln("Led: on");
+      digitalWrite(LED_BUILTIN, HIGH);
+    } else{
+      infoln("Led: off");
+      igitalWrite(LED_BUILTIN, LOW);
+    }
+    ```
+    Este bloque de código es realmente el control físico del LED. Funciona de la siguiente manera:
+    - `status` != 0 -> enciende el LED
+    - `status` == 0 -> apaga el LED
+    - `digitalWrite()` es la función estándar de Arduino para escribir en un pin digital.
+    - `LED_BUILTIN` está definido en `Config.h` y corresponde al pin físico del LED interno.
+    - Se utiliza `infoln()` para registrar el cambio en el sistema de logging, lo que dacilita la depuraciónd e código.
 
 ## logger.ino
 
