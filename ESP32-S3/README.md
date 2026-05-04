@@ -67,3 +67,74 @@ Este fichero contiene las funciones que getsionan:
 ## setup.ino
 
 ## wifi_lib.ino
+Este fichero tiene como propósito gestionar todo lo relacionado con la conexión WIFi de la ESP32-S3. Específicamente este fichero implementa un módulo de comunicaciones WiFi que lleva a cabo lo siguiente:
+1. Inicializa la interfaz WiFi de la ESP32-S3.
+2. Intenta conectarse a la red configurada en `Config.h`.
+3. Reconecta automáticamente si se pierde la conexión en algún punto del proceso.
+4. Gestiona el cliente TCP/IP que usará el broker de comunicación MQTT.
+5. permite usar TLS/SSL si el proyecto lo requiere.
+
+```cpp
+#ifdef SSL_ROOT_CA
+  WiFiClientSecure espWifiClient;
+#else
+  WiFiClient espWifiClient;
+#endif
+```
+Si el proyecto usa **TLS/SSl** se crea un cliente seguro (`WiFiClientSecure`). En el caso contrario, se usa un cliente normal en el proyecto (`WiFIClient`).  Este cliente será usado por MQTT.
+
+```cpp
+const char* wifiSSID = NET_SSID;
+const char* wifiPasswd = NET_PASSWD;
+```
+Lo que se busca con estas líneas de código es tomar el SSID y la contraseña que previamente se han definido en `Config.h`.
+
+  ### wifi_loop()
+  ```cpp
+  void wifi_loop(){
+    if(!WiFi.isConnected())
+      wifi_recomect(WIFI_CONNECTION_TIMEOUT_SECONDS);
+  }
+  ```
+  Esta función se ejecuta en cada iteración del loop principal. Su principal objetivo es detectar si la ESP32-S3 ha perdido la conexión y si es el caso, intentar reconetar automáticamente.
+
+  ### wifi_connect()
+  ```cpp
+  WiFi.mode(WIFI_STA);
+  trace("MAC Address:. ");
+  traceln(WiFi.macAddress());
+  ```
+  Configura la ESP32-S3 como estación WiFi.
+  A continuación, imprime la MAC del dispositivo. Esto se lleva a cabo porque resulta útil al sistema para la depuración del código.
+
+  ```cpp
+  #ifdef SSL_ROOT_CA
+    espWiFiClient.sestCACert(SSL_ROOT_CA);
+  #endif
+  ```
+  Esta parte del código es la encargada de la configuarción de certificados en el caso de que se apliquen. Pemrite validar certificados si se usa TLS.
+
+  ```cpp
+  wifi_reconnect(WIFI_CONNECTION_TIMEOUT_SECONDS);
+  ```
+  En este instante se llama a la función que realmente intenta conectarse.
+
+  ### wifi_reconnect()
+  ```cpp
+  WiFi.begin(wifiSSID, wifiPasswd);
+  ```
+  Inicia la conexión con la red.
+
+  ```cpp
+  while (WiFi.status() != WL_CONNECTED && r<retries){
+    delay(1000);
+    trace(".");
+  }
+  ```
+  Esta sección de código espera hasta conectarse o agortar los intentos; luego, imprime puntos para indicar progreso.
+  Si conecta correctamente se muestra la IP asignada. 
+
+  ```cpp
+    errorln("-X- Cannot connect to the WiFi newtwork");
+  ```
+  Sin embargo, si falla en el proceso de conectarse se imprime el error como muestra la línea de código.
