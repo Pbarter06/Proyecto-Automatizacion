@@ -256,7 +256,7 @@ String mqttClientID;
 Continuando con los parámetros iniciales, en este apartado se carga los parámetros definidos en `Config.h` (IP del broker, puerto y ID del cliente el cual se asignará en `mqtt_connect()`).
 
 ### void mqtt_loop()
-  ```
+  ```cpp
   if(!mqttClient.connected()){
     mqtt_reconnect(MQTT_CONNECTION_RETRIES);
     suscribirseATopics();
@@ -293,13 +293,13 @@ Continuando con los parámetros iniciales, en este apartado se carga los paráme
   ```
   El primer paso a seguir en esta función es comprobar que haya conexión a WiFI. Si no hay conexión no se intenta conectar con el broker MQTT. En el caso de que ocurra esta situación, se enviará un mensaje de aviso informando que se el dispositivo se encuentra en estado de desconexión. Posterior a imprimir por pantalla el aviso, se encuentra un bucle que se repite hasta que se consiga reconectar con la red WiFi o, en caso de no obtener éxtito, cerrar el programa porque se han agotado los intentos de reconexión.
 
-    ```cpp
-    #ifdef MQTT_USERNAME
-      if ( mqttClient.connect(mqttClientID.c_str(), MQTT_USERNAME, MQTT_PASSWORD) ) {
-    #else
-      if ( mqttClient.connect(mqttClientID.c_str()) ) {
-    #endif
-    ```
+  ```cpp
+  #ifdef MQTT_USERNAME
+    if( mqttClient.connect(mqttClientID.c_str(), MQTT_USERNAME, MQTT_PASSWORD)) {
+  #else
+    if(mqttClient.connect(mqttClientID.c_str())){
+  #endif
+  ```
   Una vez llegado a esta sección de código, se realiza un intento de conexión. Si existe un usuario con contraseña el sistema los utiliza. En el caso contrario se busca conectar sin la autenticación.
   Cuando se realiza una conexión exitosa se espera 1 segundo para estabilizar esta. No obstante, si falla se muestra el código error gracias a la gestión de errores que se implementa y se realiza una espera de 5 segundos antes de reintentar la conexión.
 
