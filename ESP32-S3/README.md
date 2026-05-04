@@ -64,37 +64,52 @@ Lo primer a realizar es declarar una variable global (entero sin signo de 8 bits
 - `0` : apagado
 - `1` : encendido
 
-  ### setInternalLed(uint8_t status)
-    Esta función busca controlar el LED interno de la ESP32-S3. Recibe como parámetro el estado deseado y actualiza el hardware.
-  
-    ```cpp
-    if(ledStatus == status)
-      return;
-    ```
-    Si el LED ya está en el estaod slicitado, la función termina inmediatamente. Esta condición evita llamadas innecesarias a `digitalWrite()`.
+### setInternalLed(uint8_t status)
+  Esta función busca controlar el LED interno de la ESP32-S3. Recibe como parámetro el estado deseado y actualiza el hardware.
 
-    ```cpp
-    ledStatus = status;
-    ```
-    Actualiza la variable global para reflejar y guardar el nuevo estado del LED.
+  ```cpp
+  if(ledStatus == status)
+    return;
+  ```
+  Si el LED ya está en el estaod slicitado, la función termina inmediatamente. Esta condición evita llamadas innecesarias a `digitalWrite()`.
 
-    ```cpp
-    if(status){
-      infoln("Led: on");
-      digitalWrite(LED_BUILTIN, HIGH);
-    } else{
-      infoln("Led: off");
-      igitalWrite(LED_BUILTIN, LOW);
-    }
-    ```
-    Este bloque de código es realmente el control físico del LED. Funciona de la siguiente manera:
-    - `status` != 0 -> enciende el LED
-    - `status` == 0 -> apaga el LED
-    - `digitalWrite()` es la función estándar de Arduino para escribir en un pin digital.
-    - `LED_BUILTIN` está definido en `Config.h` y corresponde al pin físico del LED interno.
-    - Se utiliza `infoln()` para registrar el cambio en el sistema de logging, lo que dacilita la depuraciónd e código.
+  ```cpp
+  ledStatus = status;
+  ```
+  Actualiza la variable global para reflejar y guardar el nuevo estado del LED.
+
+  ```cpp
+  if(status){
+    infoln("Led: on");
+    digitalWrite(LED_BUILTIN, HIGH);
+  } else{
+    infoln("Led: off");
+    digitalWrite(LED_BUILTIN, LOW);
+  }
+  ```
+  Este bloque de código es realmente el control físico del LED. Funciona de la siguiente manera:
+  - `status` != 0 -> enciende el LED
+  - `status` == 0 -> apaga el LED
+  - `digitalWrite()` es la función estándar de Arduino para escribir en un pin digital.
+  - `LED_BUILTIN` está definido en `Config.h` y corresponde al pin físico del LED interno.
+  - Se utiliza `infoln()` para registrar el cambio en el sistema de logging, lo que dacilita la depuraciónd e código.
 
 ## logger.ino
+Este fichero implementa un módulo de registro que permite mostrar mensajes por la terminar con distintas informaciones. Este sistema es fundamentañ àra depurar el comportamiento del firmware. 
+
+En primer lugar, se han definido los niveles de log. Estos valores numéricos representan la prioridad de cada nivel:
+- `TRACE(6)`: nivel más detallado.
+- `DEBUG(5)`: información útil.
+- `INFO(4)`: mensajes informativos generales.
+- `WARN(3)`: advertencias
+- `ERROR(2)`: errores recuperables.
+- `FATAL(1)`: errores críticos.
+- `NONE(0)`: descativa completamente el logging.
+
+El nivel activo se define en `Config.h`:
+`#define LOG_LEVEL TRACE`
+Esto significa que se mostrarán todos los mensajes, desde TRACE hasta FATAL.
+/* SEGUIR POR AQUÍ */
 
 ## loop.ino
 
