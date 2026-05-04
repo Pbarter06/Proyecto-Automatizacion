@@ -182,15 +182,15 @@ Este fichero contiene únicamente la función `on_loop()`, la cual representa la
 long now, lastMSg = 0;
 long sensorUpdateInterval = 5000;
 ```
-  ### now
-   Esta variable es la encargada de guardar el tiempo actual en milisegundos desde que la ESP32-S3 se encendió. Esto se obtiene a través de `milis()`.
+  >### now
+   >Esta variable es la encargada de guardar el tiempo actual en milisegundos desde que la ESP32-S3 se encendió. Esto se obtiene a través de `milis()`.
   
-  ### lastMsg
-  Esta variable guarda el instante en el que se ejecutó por última vez la tarea periódica. 
-  Se inicializa a 0.
+  >### lastMsg
+  >Esta variable guarda el instante en el que se ejecutó por última vez la tarea periódica. 
+  >Se inicializa a 0.
   
-  ### sensorUpdateInterval
-  En el caso de esta variable se trata de una variable que representa el intervalo de actualización en milisegundos. Al estar igualado a  5000 milisegundos, equivalente a 5 segundos, indica que la tarea periódica se ejecutará cada 5 segundos.
+  >### sensorUpdateInterval
+  >En el caso de esta variable se trata de una variable que representa el intervalo de actualización en milisegundos. Al estar igualado a  5000 milisegundos, equivalente a 5 segundos, indica que la tarea periódica se ejecutará cada 5 segundos.
   
 ## main.ino
 Este fichero se trata del fichero que contiene la estructura principal del programa. Su función es inicializar el sistema, configurar las comunicaciones WiFi y MQTT.
