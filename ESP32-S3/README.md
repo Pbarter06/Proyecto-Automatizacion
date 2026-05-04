@@ -2,7 +2,56 @@
 En esta carpeta se va a proceder a explicar la configuración en Arduino que se ha llevado a cabo para el funcionamiento del sistema embebido, ESP32-S3. Para una amyor organización, se va a dividir la explicación por ficheros.
 
 ## Config.h
-Este fichero tiene como objetivo definir constantes, parámetros necesarios para conectarse a la red, credenciales y topics para la comunicación a través del broker MQTT.
+Este fichero tiene como objetivo definir constantes, parámetros necesarios para conectarse a la red, credenciales y topics para la comunicación a través del broker MQTT. Se agrupan todos estos parámetros en el mismo fichero con el fin de si se requiere la modificación de algunos de estos parámetros poder modificarlos sin alterar el resto del código.
+
+```cpp
+#define BAUDS 115200
+```
+En primer lugar, se define la velocidad de comunicación del puerto serie. En este caso, la velocidad elegida es la estándar para la depuración rápida.
+
+```cpp
+#define LOGGER_ENABLE
+```
+En segundo lugar, si esta línea de código está activa se habilita el sistema logging implementado en el fichero `logger.ino`. En el caso de que no esté habilidato, el loggin se deshabilita de igual manera.
+
+```cpp
+#define LOG_LEVEL TRACE
+```
+A continuación, se define el nivel de severidad mínimo que se mostrará. En este caso, al tratarse de `TRACE` se trata de un nivel más detalado lo que permite ver absolutamente todos los mensajes.
+
+```cpp
+#define DEVICE_GIIROB_PR2_ID "00"
+```
+En cuanto al identificador del dispositivo se ha asignado un identificado al dispositivo del proyecto PR2. Se utiliza para construiir el `deviceID` en `main.ino`. De igual manera, permite distinguir varias ESP32-S3 en la misma red MQTT.
+
+```cpp
+#define NET_SSID "UPV-PSK"
+#define NET_PASWD "giirob-pr2-2023"
+```
+Gracias a este bloque de código se puede configurar la red WiFi. Se definen las credenciales de la red WiFi a la que se conectará la ESP32-S3.
+- `NET_SSID`: nombre de la red.
+- `NET_PASSWR`: contraseña para acceder a la red.
+Estas credenciales son utilizadas por el fichero `wifi_lab.ino`.
+
+```cpp
+#define MQTT_SERVER_IP "mqtt.dsic.upv.es"
+#define MQTT_SERVER_PORT 1883
+
+#define MQTT_USERNAME "giirob"
+#define MAQTT_PASSWORD "UPV2024"
+```
+En este caso, no se configura la red WiFi, sino que se trata de la configuración del broker MQTT. En este caso la dirección del broker MQTT es de la UPV, su puesto estándar sin TLS es 1883.
+Y en cuanto a las credenciales, se requiere saber el usuario y la contraseña para la autenticación en el broker. Estas credenciales se utilizan en `mqtt_lib.ino`.
+
+```cpp
+#define HELLO_TOPIC "giirob/pr2/devices/hello"
+```
+Este es el topic que se ha declarado para pruebas inciales del proyecto. La ESP32-S3 envía un mensaje JSON a este topic en `setup.ino`. De igual manera, también se suscribe a él para recibir comandos simples (encender/apagar LED).
+
+```cpp
+#define LED_BUILTIN 2
+```
+Por último, se define el pin físico del LED interno de la ESP32-S3. El pin se utilizará en los ficheros `funciones.ino` y `setup.ino`.
 
 ## comunicaciones.ino
 Este fichero contiene las funciones que getsionan:
