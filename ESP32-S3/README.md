@@ -90,7 +90,7 @@ Este fichero contiene las funciones que getsionan:
   ```
     Por último, si se recibe el mensaje se procede a la gestión del topic `HELLO_TOPIC`. De manera que lo primero a llevar a cabo es la comprobación de si el mensaje pertenece al topic esperado. Si es así, entonces dependiendo del mensaje recibido (`on`/ `off`) se mostrará por pantalla el estado del led interno.
 
-  ### Función 3:
+  ### void enviarMensajePorTopic(const char* topic, STring outgoingMessage):
   ```cpp
   void enviarMensajePorTopic(const char* topic, String outgoingMessage){
     mqtt_publish(topic, outgoingMessage.c_str());
@@ -108,35 +108,35 @@ Lo primer a realizar es declarar una variable global (entero sin signo de 8 bits
 - `0` : apagado
 - `1` : encendido
 
-### setInternalLed(uint8_t status)
-  Esta función busca controlar el LED interno de la ESP32-S3. Recibe como parámetro el estado deseado y actualiza el hardware.
-
-  ```cpp
-  if(ledStatus == status)
-    return;
-  ```
-  Si el LED ya está en el estaod slicitado, la función termina inmediatamente. Esta condición evita llamadas innecesarias a `digitalWrite()`.
-
-  ```cpp
-  ledStatus = status;
-  ```
-  Actualiza la variable global para reflejar y guardar el nuevo estado del LED.
-
-  ```cpp
-  if(status){
-    infoln("Led: on");
-    digitalWrite(LED_BUILTIN, HIGH);
-  } else{
-    infoln("Led: off");
-    digitalWrite(LED_BUILTIN, LOW);
-  }
-  ```
-  Este bloque de código es realmente el control físico del LED. Funciona de la siguiente manera:
-  - `status` != 0 -> enciende el LED
-  - `status` == 0 -> apaga el LED
-  - `digitalWrite()` es la función estándar de Arduino para escribir en un pin digital.
-  - `LED_BUILTIN` está definido en `Config.h` y corresponde al pin físico del LED interno.
-  - Se utiliza `infoln()` para registrar el cambio en el sistema de logging, lo que dacilita la depuraciónd e código.
+  ### setInternalLed(uint8_t status)
+    Esta función busca controlar el LED interno de la ESP32-S3. Recibe como parámetro el estado deseado y actualiza el hardware.
+  
+    ```cpp
+    if(ledStatus == status)
+      return;
+    ```
+    Si el LED ya está en el estaod slicitado, la función termina inmediatamente. Esta condición evita llamadas innecesarias a `digitalWrite()`.
+  
+    ```cpp
+    ledStatus = status;
+    ```
+    Actualiza la variable global para reflejar y guardar el nuevo estado del LED.
+  
+    ```cpp
+    if(status){
+      infoln("Led: on");
+      digitalWrite(LED_BUILTIN, HIGH);
+    } else{
+      infoln("Led: off");
+      digitalWrite(LED_BUILTIN, LOW);
+    }
+    ```
+    Este bloque de código es realmente el control físico del LED. Funciona de la siguiente manera:
+    - `status` != 0 -> enciende el LED
+    - `status` == 0 -> apaga el LED
+    - `digitalWrite()` es la función estándar de Arduino para escribir en un pin digital.
+    - `LED_BUILTIN` está definido en `Config.h` y corresponde al pin físico del LED interno.
+    - Se utiliza `infoln()` para registrar el cambio en el sistema de logging, lo que dacilita la depuraciónd e código.
 
 ## logger.ino
 Este fichero implementa un módulo de registro que permite mostrar mensajes por la terminar con distintas informaciones. Este sistema es fundamentañ àra depurar el comportamiento del firmware. 
@@ -183,7 +183,7 @@ long now, lastMSg = 0;
 long sensorUpdateInterval = 5000;
 ```
   ### now
-  Esta variable es la encargada de guardar el tiempo actual en milisegundos desde que la ESP32-S3 se encendió. Esto se obtiene a través de `milis()`.
+   Esta variable es la encargada de guardar el tiempo actual en milisegundos desde que la ESP32-S3 se encendió. Esto se obtiene a través de `milis()`.
   
   ### lastMsg
   Esta variable guarda el instante en el que se ejecutó por última vez la tarea periódica. 
@@ -200,7 +200,7 @@ String deviceID = String("giirobpr2-device-") + STring(DEVICE_GIIROB_PR2_ID);
 ```
 Primeramente, se define un identificador único del dispositivo. Se usa para registrarse en el broker MQTT.
 
-### setup()
+  ### setup()
   Esta función se ejecuta una sola vez al arrancar la ESP32-S3.
   ```cpp
   #ifdef LOGGER_ENABLED
