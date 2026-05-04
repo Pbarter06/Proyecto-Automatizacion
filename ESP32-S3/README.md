@@ -124,15 +124,30 @@ En el caso de esta variable, es la encargada de controlar si se debe imprimir la
 - `_log_newline == true ` : se imprime la etiqueta.
 - `_log_newline == flase` : el mensaje anterior no terminó en salto de línea, por lo que no se repite la etiqueta.
 
-  ```cpp
-  #define info(message)  if (LOG_LEVEL >= INFO) { if (_log_newline) Serial.print("[INFO] "); Serial.print(message);  _log_newline = false; }
-  #define info(message)  if (LOG_LEVEL >= INFO) { if (_log_newline) Serial.print("[INFO] "); Serial.printls(message);  _log_newline = true; }
-  ```
-  El bloque de código que surge a continuación sigue esta estructura, esto permite comprobar si el nivel de log actual permite mostrar ese mesaje, si corresponde, en ese caso imprime la etiqueta `[INFO]`. Luego, imprime el emnsaje y actualiza en último lugar la variable `_log_newline` según si se usó `print()` o `println()`.
+```cpp
+#define info(message)  if (LOG_LEVEL >= INFO) { if (_log_newline) Serial.print("[INFO] "); Serial.print(message);  _log_newline = false; }
+#define info(message)  if (LOG_LEVEL >= INFO) { if (_log_newline) Serial.print("[INFO] "); Serial.printls(message);  _log_newline = true; }
+```
+El bloque de código que surge a continuación sigue esta estructura, esto permite comprobar si el nivel de log actual permite mostrar ese mesaje, si corresponde, en ese caso imprime la etiqueta `[INFO]`. Luego, imprime el emnsaje y actualiza en último lugar la variable `_log_newline` según si se usó `print()` o `println()`.
 Sin embargo, si el logging se encuentra desactivado, el compilador elimina completamente el código de loggin y todas las macros se convierten en líneas vacías.
 
 ## loop.ino
+Este fichero contiene únicamente la función `on_loop()`, la cual representa la parte del programa que se ejecuta de manera repetitiva durante todo el proceso de ejecución.
 
+```cpp
+long now, lastMSg = 0;
+long sensorUpdateInterval = 5000;
+```
+  ### now
+  Esta variable es la encargada de guardar el tiempo actual en milisegundos desde que la ESP32-S3 se encendió. Esto se obtiene a través de `milis()`.
+  
+  ### lastMsg
+  Esta variable guarda el instante en el que se ejecutó por última vez la tarea periódica. 
+  Se inicializa a 0.
+  
+  ### sensorUpdateInterval
+  En el caso de esta variable se trata de una variable que representa el intervalo de actualización en milisegundos. Al estar igualado a  5000 milisegundos, equivalente a 5 segundos, indica que la tarea periódica se ejecutará cada 5 segundos.
+  
 ## main.ino
 
 ## mqtt_lib.ino
