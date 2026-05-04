@@ -48,10 +48,10 @@ Este fichero contiene las funciones que getsionan:
 
   ### Función 3:
   ```cpp
-void enviarMensajePorTopic(const char* topic, String outgoingMessage){
-  mqtt_publish(topic, outgoingMessage.c_str());
-}
-```
+  void enviarMensajePorTopic(const char* topic, String outgoingMessage){
+    mqtt_publish(topic, outgoingMessage.c_str());
+  }
+  ```
   Esta última función del fichero es la encargada de publicar un mensaje a través de un canal MQTT. Su funcionamiento es el inverso a la primera función que se ha analizado; convierte el `String` a `const char*` para la librería MQTT.
   
 ## funciones.ino
