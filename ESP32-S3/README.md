@@ -256,7 +256,7 @@ String mqttClientID;
 Continuando con los parámetros iniciales, en este apartado se carga los parámetros definidos en `Config.h` (IP del broker, puerto y ID del cliente el cual se asignará en `mqtt_connect()`).
 
 ### void mqtt_loop()
-  ```cpp
+  ```
   if(!mqttClient.connected()){
     mqtt_reconnect(MQTT_CONNECTION_RETRIES);
     suscribirseATopics();
