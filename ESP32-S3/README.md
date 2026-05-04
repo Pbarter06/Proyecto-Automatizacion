@@ -107,9 +107,29 @@ En primer lugar, se han definido los niveles de log. Estos valores numéricos re
 - `NONE(0)`: descativa completamente el logging.
 
 El nivel activo se define en `Config.h`:
-`#define LOG_LEVEL TRACE`
+```cpp
+#define LOG_LEVEL TRACE
+```
 Esto significa que se mostrarán todos los mensajes, desde TRACE hasta FATAL.
-/* SEGUIR POR AQUÍ */
+
+```cpp
+#ifdef LOG_LEVEL
+```
+Este bloque solo se commpila si existe una constante denominada `LOG_LEVEL`. Si no está definida, todo el logging se desactiva automáticamente.
+
+```cpp
+bool _log_newline = true;
+```
+En el caso de esta variable, es la encargada de controlar si se debe imprimir la etiquera del nivel (`[INFO]`, `[ERROR]`, etc) antes del mensaje.
+- `_log_newline == true ` : se imprime la etiqueta.
+- `_log_newline == flase` : el mensaje anterior no terminó en salto de línea, por lo que no se repite la etiqueta.
+
+  ```cpp
+  #define info(message)  if (LOG_LEVEL >= INFO) { if (_log_newline) Serial.print("[INFO] "); Serial.print(message);  _log_newline = false; }
+  #define info(message)  if (LOG_LEVEL >= INFO) { if (_log_newline) Serial.print("[INFO] "); Serial.printls(message);  _log_newline = true; }
+  ```
+  El bloque de código que surge a continuación sigue esta estructura, esto permite comprobar si el nivel de log actual permite mostrar ese mesaje, si corresponde, en ese caso imprime la etiqueta `[INFO]`. Luego, imprime el emnsaje y actualiza en último lugar la variable `_log_newline` según si se usó `print()` o `println()`.
+Sin embargo, si el logging se encuentra desactivado, el compilador elimina completamente el código de loggin y todas las macros se convierten en líneas vacías.
 
 ## loop.ino
 
