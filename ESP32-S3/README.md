@@ -65,6 +65,38 @@ Este fichero contiene las funciones que getsionan:
 ## mqtt_lib.ino
 
 ## setup.ino
+La finalidad de este fichero es inicializar los recursos de la ESP32-S3 y enviar un mensaje inicial al broker MQTT para confirmar que el dispositivo está operativo.
+
+  ### on_setup()
+  Esta función solamente se ejecutará una vez tras la incialización del sistema.
+  
+  ```cpp
+  pinMode(LED_BUILTIN, OUTPUT);
+  ```
+  Lo primero a llevar a cabo es la confugración del pin asociado al LED. Se configura como salida digital (`OUTPUT`). La función del LED es un indicador visual que informa del estado del dispositivo.
+
+  ```cpp
+  setInternalLed(0);
+  ```
+  Lo segundo a realizar es la inicialización del LED interno. A través de esta línea de código, se llama a la función definida en el fichero `funciones.ino`. En este caso, `0` significa apagar el LED. Esto garantiza que el dispositivo arranca en un estado conocido y facilita el trabajo que se lleva a cabo a continuación.
+
+  ```cpp
+  JsonDOcument doc;
+  doc["message] = hello_msg;
+  doc["luminosidad"] = 450;
+  doc["temperatura"] = 21.5;
+  ```
+  Después de la creación de un mensaje de texto que se enviará al broker MQTT donde identifica al dispositivo se crea un objeto JSON, gracias a la librería correspondiente. Este objeto permitirá estructurar los datos de manera estándar.  Luego, se asignan los campos al objeto.
+  - `message` : texto de saludo
+  - `luminosidad`: valor numérico
+  - `temperatura`: valor con decimales
+
+  ```cpp
+  String hello_mgg_json;
+  serializeJson(doc, hello_msg_json);
+  enviarMensajePorTopic(HELLO_TOPIC, hello_msg_json);
+  ```
+Por último, el objeto JSON se convierte en un`String`y está listo para enviarse por MQTT. En el caso de `serializeJson()` permite transformar la estructura interna en un texto. Finalmente, se envía el mensaje al broker MQTT. Se publica el JSON en el topic definido en `Config.h`.
 
 ## wifi_lib.ino
 Este fichero tiene como propósito gestionar todo lo relacionado con la conexión WIFi de la ESP32-S3. Específicamente este fichero implementa un módulo de comunicaciones WiFi que lleva a cabo lo siguiente:
