@@ -198,6 +198,52 @@ long sensorUpdateInterval = 5000;
   En el caso de esta variable se trata de una variable que representa el intervalo de actualización en milisegundos. Al estar igualado a  5000 milisegundos, equivalente a 5 segundos, indica que la tarea periódica se ejecutará cada 5 segundos.
   
 ## main.ino
+Este fichero se trata del fichero que contiene la estructura principal del programa. Su función es inicializar el sistema, configurar las comunicaciones WiFi y MQTT.
+
+```cpp
+String deviceID = String("giirobpr2-device-") + STring(DEVICE_GIIROB_PR2_ID);
+```
+Primeramente, se define un identificador único del dispositivo. Se usa para registrarse en el broker MQTT.
+
+### setup()
+  Esta función se ejecuta una sola vez al arrancar la ESP32-S3.
+  ```cpp
+  #ifdef LOGGER_ENABLED
+    Serial.begin(NAUDS);
+    delay(1000);
+    Serial.println();
+  #endif
+  ```
+  Lo siguiente a definir un identificador es la incialización de logger. INicia el puerto seria a 115200 baudios y permite imrimir mensajes de depuración. No obstante, solo se activa se `LOGGER_ENABLED` está definido en el ficher `Config.h`.
+  
+  ```cpp
+  wifi_connect();
+  ```
+  EL siguiente paso para un buen funcionamiento es la conexión WiFi. En este caso, se llama a la función definida en `wifi_lib.ino` donde se configura la interfaz y se intenta conectar.
+  
+  ```cpp
+  mqtt_connect(deviceID);
+  ```
+  De igual manera, se conecta al broker MQTT. En el caso de MQTT se configura el cliente y se establece la conexión con éste. Además, para concluir se registra el callback para aquellos nuevos mensajes que entren.
+  
+  ```cpp
+  suscribirseATopics();
+  ```
+  Esta línea de código implica la llamada a la función definida peviamente en el fichero `comunicaciones.ino`. Es en esta función donde se añaden todos los topics que la ESP32-S3 debe escuchar o utilizar para enviar mensajes.
+
+  ```cpp
+  on_setup();
+  ```
+  Lo último a realizar en esta función es la configuración adicional del dispositivo mediante la función `on_setup()` definida en `setup.ino`. En ese fichero se realiza la configuración de pines, la inicialización del LED y el envío de mensajes JSON.
+  
+### void loop()
+  Esta función se ejecuta continuamente mientras la ESP32-S3 está encendida.
+  ```cpp
+  wifi_loop();
+  mqtt_loop();
+  on_loop();
+  ```
+Como se puede observar, dentro de la función loop() se realiza el mantenimiento de la conexión WiFi, MQTT y las tareas periódicas que se llevan a cabo en la función `on_loop()`.
 
 ## mqtt_lib.ino
 
