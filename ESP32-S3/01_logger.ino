@@ -1,3 +1,5 @@
+#include "00_Config.h"
+
 // LOGGING
 #define TRACE 6
 #define DEBUG 5

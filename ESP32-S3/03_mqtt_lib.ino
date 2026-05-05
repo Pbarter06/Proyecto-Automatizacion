@@ -1,5 +1,6 @@
 #define MQTT_CONNECTION_RETRIES 3
 
+WiFiClient espWifiClient;
 PubSubClient mqttClient(espWifiClient);
 
 // MQTT CONFIG

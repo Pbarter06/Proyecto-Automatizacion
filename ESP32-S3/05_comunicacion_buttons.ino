@@ -1,4 +1,4 @@
-long now, lastMsg = 0;
+long now = 0, lastMsg = 0;
 long sensorsUpdateInterval = 5000; // tiempo de actualización de los sensores
 
 
