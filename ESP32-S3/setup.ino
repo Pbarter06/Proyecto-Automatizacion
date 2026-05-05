@@ -1,21 +1,20 @@
 void on_setup() {
 
-    // initialize digital pin LED_BUILTIN as an output.
-    pinMode(LED_BUILTIN, OUTPUT);
+    pinMode(LED_FUNCIONAMIENTO, OUTPUT);
+    pinMode(LED_PALET1_LLENO, OUTPUT);
+    pinMode(LED_PALET2_LLENO, OUTPUT);
+
+    pinMode(BUTTON_VACIAR_PALET1, INPUT_PULLUP);
+    pinMode(BUTTON_VACIAR_PALET2, INPUT_PULLUP);
+    pinMode(AZULEJO_BUENO, INPUT_PULLUP);
+    pinMode(AZULEJO_MALO, INPUT_PULLUP);
+    pinMode(AZULEJO_DEFECTUOSO, INPUT_PULLUP);
+
+    // Estado inicial LEDs externos: apagados
+    digitalWrite(LED_PALET1_LLENO, LOW);
+    digitalWrite(LED_PALET2_LLENO, LOW);
 
     setInternalLed(0);
-
-    String hello_msg = String("Hola Mundo! Desde dispositivo ") + deviceID;
-
-    // Test JSON
-    JsonDocument doc;
-    doc["message"] = hello_msg;
-    doc["luminosidad"] = 450;
-    doc["temperatura"] = 21.5;
-    String hello_msg_json;
-    serializeJson(doc, hello_msg_json);
-    enviarMensajePorTopic(HELLO_TOPIC, hello_msg_json);
-
 
 }
 

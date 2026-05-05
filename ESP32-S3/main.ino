@@ -6,7 +6,6 @@
  **************************************************************************
  */
 #include "Config.h"
-
 #include <WiFi.h>
 #ifdef SSL_ROOT_CA
   #include <WiFiClientSecure.h>
@@ -58,8 +57,6 @@ void loop() {
   // NO QUITAR (jjfons)
   wifi_loop();
   mqtt_loop();
-
-  // TODO: completar esta función (w_loop.ino)
   on_loop();
 }
 
