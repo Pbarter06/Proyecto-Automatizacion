@@ -56,11 +56,7 @@ void mqtt_reconnect(int retries) {
     // Attempt to connect
     // boolean connect (clientID, [username, password], [willTopic, willQoS, willRetain, willMessage], [cleanSession])
 
-  #ifdef MQTT_USERNAME
-    if ( mqttClient.connect(mqttClientID.c_str(), MQTT_USERNAME, MQTT_PASSWORD) ) {
-  #else
     if ( mqttClient.connect(mqttClientID.c_str()) ) {
-  #endif
       debugln("-=- Connected to MQTT Broker");
       // Damos tiempo a que la conexión se establezca por completo
       delay(1000);

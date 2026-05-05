@@ -41,8 +41,17 @@ void wifi_connect() {
 
 void wifi_reconnect(uint retries) {
 
+  if (WiFi.status() == WL_CONNECTED) {
+    return;
+  }
+
+
   trace("Connecting to ");
   traceln(wifiSSID);
+
+  WiFi.disconnect(true);
+  delay(500);
+
   WiFi.begin(wifiSSID, wifiPasswd);
 
   uint8_t r = 0;

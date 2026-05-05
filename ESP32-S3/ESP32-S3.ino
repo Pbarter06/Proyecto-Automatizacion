@@ -14,7 +14,8 @@
 #include <ArduinoJson.h>
 
 // ID de Dispositivo : se proporcionan varias alternativas, a modo de ejemplo
-String deviceID = String("giirobpr2-device-") + String(DEVICE_GIIROB_PR2_ID); 
+String deviceID = "esp32-" + WiFi.macAddress(); 
+
   // Versión usando el ID asignado en la asignatura GIIROB-PR2
 //String deviceID = String("device-") + String(WiFi.macAddress());            
   // Versión usando la dirección MAC del dispositivo
@@ -37,6 +38,8 @@ void setup() {
   delay(1000);
   Serial.println();
 #endif
+
+Serial.println(deviceID);
 
   // Nos conectamos a la wifi
   wifi_connect();
