@@ -15,6 +15,8 @@ void setInternalLed(uint8_t status) {
     }
 }
 
+
+/*
 // Función para eliminar los primeros n caracteres de una cadena
 void eliminarPrimeros(char *cadena, size_t n) {
     size_t len = strlen(cadena);
@@ -29,4 +31,4 @@ void eliminarPrimeros(char *cadena, size_t n) {
     memmove(cadena, cadena + n, len - n + 1); 
     // +1 para incluir el carácter nulo '\0'
 }
-
+*/

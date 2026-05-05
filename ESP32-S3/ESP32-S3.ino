@@ -5,7 +5,7 @@
  * 
  **************************************************************************
  */
-#include "Config.h"
+#include "00_Config.h"
 #include <WiFi.h>
 #ifdef SSL_ROOT_CA
   #include <WiFiClientSecure.h>
@@ -44,17 +44,14 @@ void setup() {
   // Nos conectamos al broker MQTT, indicando un 'client-id'
   mqtt_connect(deviceID);
 
-  // TODO: completar esta función (g_comunicaciones.ino)
   suscribirseATopics();
 
-  // TODO: completar esta función (s_setup.ino)
   on_setup();
 
 }
 
 void loop() {
 
-  // NO QUITAR (jjfons)
   wifi_loop();
   mqtt_loop();
   on_loop();

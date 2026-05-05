@@ -1,6 +1,5 @@
 #define MQTT_CONNECTION_RETRIES 3
 
-WiFiClient espWifiClient;
 PubSubClient mqttClient(espWifiClient);
 
 // MQTT CONFIG
@@ -94,7 +93,7 @@ void mqttCallback(char* topic, byte* message, unsigned int length) {
 
 void mqtt_publish(const char* topic, String outgoingMessage) {
   if ( !mqttClient.connected() ) {
-    errorln("Cannot send message through the topic ... the MQTT Client is disconnected!!");
+    errorln("Cannot send message through the topic ... the MQTT Client is disconnected!!")
     return;
   }
 
@@ -107,7 +106,7 @@ void mqtt_publish(const char* topic, String outgoingMessage) {
 
 void mqtt_subscribe(const char* topic) {
   if ( !mqttClient.connected() ) {
-    errorln("Cannot subscribe to topic ... the MQTT Client is disconnected!!");
+    errorln("Cannot subscribe to topic ... the MQTT Client is disconnected!!")
     return;
   }
 
@@ -116,4 +115,3 @@ void mqtt_subscribe(const char* topic) {
   traceln(topic);
   mqttClient.subscribe(topic);
 }
-

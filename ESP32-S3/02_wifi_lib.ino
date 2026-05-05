@@ -61,6 +61,3 @@ void wifi_reconnect(uint retries) {
     errorln("-X- Cannot connect to the WiFi newtwork");
   }
 }
-
-
-

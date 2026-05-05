@@ -1,5 +1,10 @@
+#include "buttons.h"
+
 long now = 0, lastMsg = 0;
 long sensorsUpdateInterval = 5000; // tiempo de actualización de los sensores
+
+struct BotonMQTT;
+void gestionarBoton(BotonMQTT& boton);
 
 
 void enviarMensajePorTopic(const char* topic, String outgoingMessage) {
@@ -8,14 +13,6 @@ void enviarMensajePorTopic(const char* topic, String outgoingMessage) {
 
 }
 
-struct BotonMQTT {
-  uint8_t pin;
-  const char* topic;
-  const char* payload;
-  bool lastReading;
-  bool stableState;
-  unsigned long lastDebounceTime;
-};
 
 void gestionarBoton(BotonMQTT& boton) {
   const unsigned long debounceDelay = 50;
