@@ -113,46 +113,46 @@ La base de datos modela el flujo de factores externos con el paletizado, empaque
     - Correo Electrónico
   Estos proveedores suministran las cajas vacías que posteriormente se llenarán de azulejos.
 
-### CAJA_VACÍA
-```sql
-INSERT INTO Caja_Vacia(N_Lote, Tamano)
-VALUES
-```
-Así pues, en este casos se insertan 7 cajas. Estas cajas son las unidades básicas que se compran a proveedores.
-
-### COMPRA
-Se registra un historial apliado de compras donde se almacena el proveedor, el lote comprado, su fecha y el precio final. Cada compra debe cumplir:
-  - `NIF_Proveedor`
-  - `N_Lote`
-
-### CLIENTE
-```sql
-INSERT INTO Cliente (NIF, Telefono, Correo, DIreccion)
-VALUES
-```
-De igual manera, se insertan 10 clientes, cada uno con su correspondiente `NIF`, `Teléfono`, `Correo`y `Dirección`. estos clientes serán los destinatarios de los pedidos.
-
-### PEDIDO
-```sql
-INSERT INTO Pedido (codigo_compra, Precio, Fecha_compra, NIF_Cliente)
-VALUES
-```
-Aquí, se insertan 13 pedidos, cada uno asociado a un cliente.
-
-### CAJA_LLENA
-```sql
-INSERT INTO Caja_Llena(ID_Lote, Tamano, Tipo, Código_compra)
-VALUES
-```
-Se insertan 17 cajas llenas, clasificadas por:
-  - Tamaño
-  - Tipo
-  - Pedido al que pertenecen
-  - Código_compra
-
-### AZULEJOS
-```sql
-INSERT INTO Azulejo (N_Serie, Estado, ID_Lote)
-VALUES
-```
-Finalmente, se insertan más de 70 azulejos individuales, cada uno con su respectivo número de serie, estado, lote al que pertenecen y ID. Asimismo, los azulejos están organizados por lotes según el estado en el que se encuentren.
+  ### CAJA_VACÍA
+  ```sql
+  INSERT INTO Caja_Vacia(N_Lote, Tamano)
+  VALUES
+  ```
+  Así pues, en este casos se insertan 7 cajas. Estas cajas son las unidades básicas que se compran a proveedores.
+  
+  ### COMPRA
+  Se registra un historial apliado de compras donde se almacena el proveedor, el lote comprado, su fecha y el precio final. Cada compra debe cumplir:
+    - `NIF_Proveedor`
+    - `N_Lote`
+  
+  ### CLIENTE
+  ```sql
+  INSERT INTO Cliente (NIF, Telefono, Correo, DIreccion)
+  VALUES
+  ```
+  De igual manera, se insertan 10 clientes, cada uno con su correspondiente `NIF`, `Teléfono`, `Correo`y `Dirección`. estos clientes serán los destinatarios de los pedidos.
+  
+  ### PEDIDO
+  ```sql
+  INSERT INTO Pedido (codigo_compra, Precio, Fecha_compra, NIF_Cliente)
+  VALUES
+  ```
+  Aquí, se insertan 13 pedidos, cada uno asociado a un cliente.
+  
+  ### CAJA_LLENA
+  ```sql
+  INSERT INTO Caja_Llena(ID_Lote, Tamano, Tipo, Código_compra)
+  VALUES
+  ```
+  Se insertan 17 cajas llenas, clasificadas por:
+    - Tamaño
+    - Tipo
+    - Pedido al que pertenecen
+    - Código_compra
+  
+  ### AZULEJOS
+  ```sql
+  INSERT INTO Azulejo (N_Serie, Estado, ID_Lote)
+  VALUES
+  ```
+  Finalmente, se insertan más de 70 azulejos individuales, cada uno con su respectivo número de serie, estado, lote al que pertenecen y ID. Asimismo, los azulejos están organizados por lotes según el estado en el que se encuentren.
