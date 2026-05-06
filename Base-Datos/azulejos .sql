@@ -18,7 +18,7 @@ CREATE TABLE Pedido (
     Codigo_Compra   VARCHAR(10) PRIMARY KEY,
     Precio          REAL NOT NULL,
     Fecha_Compra    DATE NOT NULL,
-    NIF_cliente     VARCHAR(9) NOT NULL,
+    NIF_Cliente     VARCHAR(9) NOT NULL,
 
     CONSTRAINT fk_Pedido_Cliente
         FOREIGN KEY (NIF_Cliente)
