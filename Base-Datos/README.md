@@ -1,4 +1,3 @@
-) PRIMARY KEY,
 # CÓDIGOS BASE DE DATOS 
 En esta carpeta se va a decsirbir la estructura, relaciones y contenido inicial de la base de datos utilizada en el proyecto automatizado.
 La base de datos modela el flujo de factores externos con el paletizado, empaquetado y control de calidad de los azulejos. Asimismo, la base de datos se compone en dos ficheros:
@@ -16,7 +15,7 @@ La base de datos modela el flujo de factores externos con el paletizado, empaque
   ### Tabla Cliente
   ```sql
   CREATE TABLE Cliente(
-    NIF VARCHAR(9)
+    NIF VARCHAR(9) PRIMARY KEY,
     Teléfono VARCHAR(15) NOT NULL,
     Correo VARCHAR(150) NOT NULL,
     Dirección VARCHAR(100)
