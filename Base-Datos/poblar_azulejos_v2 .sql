@@ -1,9 +1,9 @@
 SET search_path TO azulejos;
 
 -- ============================================
--- 1. PROVEEDORES
+-- 1. PROVEEDOR
 -- ============================================
-INSERT INTO proveedores (nif, telefono, direccion, correo)
+INSERT INTO Proveedor (NIF, Telefono, Direccion, Correo)
 VALUES
 ('A11111111', '961000001', 'Pol. Ind. El Palleter, Valencia', 'ventas@porcelanas-levante.com'),
 ('B22222222', '964000002', 'Camino del Barro 45, Castellón', 'pedidos@azulejos-castellon.es'),
@@ -16,17 +16,17 @@ VALUES
 ('I99999999', '935666777', 'Av. Diagonal 400, Barcelona', 'premium@luxe-tiles.com');
 
 -- ============================================
--- 2. CAJAS VACÍAS
+-- 2. CAJA VACÍA
 -- ============================================
-INSERT INTO cajas_vacias (n_lote, tamano)
+INSERT INTO Cajas_vacia (N_lote, Tamano)
 VALUES
 ('V-PEQ', 10), ('V-MED', 25), ('V-GRA', 50), ('V-IND', 100),
 ('V-XTRA', 200), ('V-MUESTR', 5), ('V-ZOC', 15);
 
 -- ============================================
--- 3. COMPRAS (Historial ampliado)
+-- 3. COMPRA
 -- ============================================
-INSERT INTO compra (nif_proveedor, n_lote, fecha_compra, precio_final)
+INSERT INTO Compra (NIF_Proveedor, N_lote, Fecha_Compra, Precio_Final)
 VALUES
 ('A11111111', 'V-GRA', '2024-11-10', 500.00), 
 ('B22222222', 'V-MED', '2024-11-15', 250.00),
@@ -43,9 +43,9 @@ VALUES
 ('I99999999', 'V-GRA', '2025-04-20', 600.00);
 
 -- ============================================
--- 4. CLIENTES
+-- 4. CLIENTE
 -- ============================================
-INSERT INTO clientes (nif, telefono, correo, direccion)
+INSERT INTO Cliente (NIF, Telefono, Correo, Direccion)
 VALUES
 ('10101010A', '600000001', 'reformas.juan@gmail.com', 'Calle Mayor 1, Valencia'),
 ('20202020B', '600000002', 'ana.garcia@outlook.com', 'Av. del Puerto 45, Gandia'),
@@ -59,9 +59,9 @@ VALUES
 ('01010101J', '677888999', 'info@deco-interiores.es', 'Paseo de Gracia 88, Barcelona');
 
 -- ============================================
--- 5. PEDIDOS
+-- 5. PEDIDO
 -- ============================================
-INSERT INTO pedido (codigo_compra, precio, fecha_compra, nif_cliente)
+INSERT INTO Pedido (Codigo_Compra, Precio, Fecha_Compra, NIF_Cliente)
 VALUES
 ('P25-001', 1500.00, '2025-01-10', '60606060F'), 
 ('P25-002', 320.50,  '2025-01-12', '10101010A'),
@@ -78,9 +78,9 @@ VALUES
 ('P25-013', 950.40,  '2025-04-25', '01010101J');
 
 -- ============================================
--- 6. CAJAS LLENAS
+-- 6. CAJA LLENA
 -- ============================================
-INSERT INTO cajas_llenas (id_lote, tamano, tipo, codigo_compra)
+INSERT INTO Cajas_llenas (ID_lote, Tamano, Tipo, Codigo_Compra)
 VALUES
 ('L-001', 100, 'bueno', 'P25-001'), ('L-002', 100, 'bueno', 'P25-001'),
 ('L-003', 25, 'bueno', 'P25-002'), ('L-004', 10, 'defectuoso', 'P25-003'),
@@ -93,9 +93,9 @@ VALUES
 ('L-017', 50, 'defectuoso', 'P25-013');
 
 -- ============================================
--- 7. AZULEJOS
+-- 7. AZULEJO
 -- ============================================
-INSERT INTO azulejos (n_serie, estado, id_lote)
+INSERT INTO Azulejo (N_serie, Estado, ID_lote)
 VALUES
 -- Lote L-001
 ('S1-001', 'bueno', 'L-001'), ('S1-002', 'bueno', 'L-001'), ('S1-003', 'bueno', 'L-001'), ('S1-004', 'bueno', 'L-001'), ('S1-005', 'bueno', 'L-001'),
