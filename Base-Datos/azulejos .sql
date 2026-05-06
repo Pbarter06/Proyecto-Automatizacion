@@ -2,9 +2,9 @@ CREATE SCHEMA azulejos;
 SET search_path TO azulejos;
 
 -- ============================================
--- CLIENTES
+-- CLIENTE
 -- ============================================
-CREATE TABLE clientes (
+CREATE TABLE cliente (
     nif           VARCHAR(9) PRIMARY KEY,
     telefono      VARCHAR(15) NOT NULL,
     correo        VARCHAR(150) NOT NULL,
@@ -22,15 +22,15 @@ CREATE TABLE pedido (
 
     CONSTRAINT fk_pedido_cliente
         FOREIGN KEY (nif_cliente)
-        REFERENCES clientes(nif)
+        REFERENCES cliente(nif)
         ON UPDATE CASCADE
         ON DELETE RESTRICT
 );
 
 -- ============================================
--- CAJAS LLENAS
+-- CAJA LLENA
 -- ============================================
-CREATE TABLE cajas_llenas (
+CREATE TABLE caja_llena (
     id_lote        VARCHAR(10) PRIMARY KEY,
     tamano         REAL NOT NULL,
     tipo           CHAR(12) NOT NULL,
@@ -39,7 +39,7 @@ CREATE TABLE cajas_llenas (
     CONSTRAINT ck_tipo
         CHECK (tipo IN ('roto', 'defectuoso', 'bueno')),
 
-    CONSTRAINT fk_cajas_pedido
+    CONSTRAINT fk_caja_pedido
         FOREIGN KEY (codigo_compra)
         REFERENCES pedido(codigo_compra)
         ON UPDATE CASCADE
@@ -49,7 +49,7 @@ CREATE TABLE cajas_llenas (
 -- ============================================
 -- AZULEJOS
 -- ============================================
-CREATE TABLE azulejos (
+CREATE TABLE azulejo (
     n_serie   VARCHAR(10) PRIMARY KEY,
     estado    CHAR(12) NOT NULL,
     id_lote   VARCHAR(10) NOT NULL,
@@ -59,13 +59,13 @@ CREATE TABLE azulejos (
 
     CONSTRAINT fk_azulejo_caja
         FOREIGN KEY (id_lote)
-        REFERENCES cajas_llenas(id_lote)
+        REFERENCES caja_llena(id_lote)
         ON UPDATE CASCADE
         ON DELETE RESTRICT
 );
 
 -- ============================================
--- PROVEEDORES
+-- PROVEEDOR
 -- ============================================
 CREATE TABLE proveedores (
     nif        VARCHAR(10) PRIMARY KEY,
@@ -75,9 +75,9 @@ CREATE TABLE proveedores (
 );
 
 -- ============================================
--- CAJAS VACIAS
+-- CAJA VACIA
 -- ============================================
-CREATE TABLE cajas_vacias (
+CREATE TABLE caja_vacia (
     n_lote   VARCHAR(10) PRIMARY KEY,
     tamano   INT NOT NULL
 );
@@ -96,13 +96,13 @@ CREATE TABLE compra (
 
     CONSTRAINT fk_compra_proveedor
         FOREIGN KEY (nif_proveedor)
-        REFERENCES proveedores(nif)
+        REFERENCES proveedor(nif)
         ON UPDATE CASCADE
         ON DELETE RESTRICT,
 
     CONSTRAINT fk_compra_caja
         FOREIGN KEY (n_lote)
-        REFERENCES cajas_vacias(n_lote)
+        REFERENCES caja_vacia(n_lote)
         ON UPDATE CASCADE
         ON DELETE RESTRICT
 );
