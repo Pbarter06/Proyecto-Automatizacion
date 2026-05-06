@@ -237,5 +237,43 @@ Por último, para publicar el mensaje deseado se puede realizar de dos maneras d
   En conclusión, el script leerMQTTS.py en su mayor porcentaje es equivalente al script leerMQTTB.py excepto por los topics con los que se trabaja y el controlador importado.
  
 ## Calidad de Vida
+Este script se centra en el borrado de todos los azulejos que existan en las tres zonas diferentes de la estación de trabajo de RoboDK.
+Una vez se han realizado las importaciones requeridas por el proceso, además de la conexión al RoboDK, se busca obtener los frames donde buscar azulejos.
+```py
+frame1 = RDK.Item('CintaCaja1')
+frame2 = RDK.Item('CintaCaja2')
+frame3 = RDK.Item('SMC ZXP7A01-ZP20U-X1 Vacuum Gripper')
+```
+El `frame1` contiene las cajas/azulejos de la Cinta 1. Mientras que el `frame2` contiene las cajas/azulejos de la Cinta 2. Y en cuanto al `frame3` , éste contiene los objetos agarrados por la ventosa de la unidad robótica correspondiente. El script busca el borrado de los azulejos en estos tres escenarios. Para ello, requiere de los objetos hilos de cada frame:
+```py
+lista_caja1 = frame1.Childs()
+lista_caja2 = frame2.Childs()
+lista_caja3 = frame3.Childs()
+```
+En este caso, `Childs()` devuelve todos los objetos dentro del frame, por lo que en el caso de la celda devolverá las cajas y los azulejos principalmente -también pueden aparecer otros elementos que se encuentren dentro del frame-. Esto permite recorrerlos uno a uno para decidir cuáles se deben eliminar.
+
+### Borrado de azulejos de la Cinta 1
+```py
+for item in lista_caja1:
+    if item.Name().startswith('Azulejo'):
+        item.Delete()
+```
+En esta ocasión, se recorre todos los objetos dentro de `CintaCaja1` y si el nombre del objeto empieza por "_Azulejos_" en ese caso se borra de la estación. De esta manera, se consigue eliminar todos aquellos azulejos que se encuentren en la Cinta 1.
+
+### Borrado de azulejos de la Cinta 2
+```py
+for item in lista_caja2:
+    if item.Name().startswith('Azulejo'):
+        item.Delete()
+```
+El proceso para el borrado de los azulejos de la Cinta 2 es equivalente al anterior.
+
+### Borrado de azulejos de la Ventosa del Robot
+```py
+for item in lista_caja3:
+    if item.Name().startswith('Azulejo'):
+        item.Delete()
+```
+Por último, para el borrado de azulejos en el escenario de la herramienta del cobot se ha utilizado una implementación similar. Lo único a destacar es que se recorren todos los objetos -al igual que en los casos anteriores- que se encuentran en la ventosa. 
 
 ## Base de Datos
