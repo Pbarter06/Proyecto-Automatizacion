@@ -30,23 +30,22 @@
 #define PALET2_STATUS_TOPIC              "sim/working/palet2" // Topic para publicar el estado del palet 2 (lleno/vacío)
 
 // LEDS (OUTPUTS)
-#define LED_FUNCIONAMIENTO      2 // GPIO0, LED integrado en la placa (ON: LOW, OFF: HIGH)
-#define LED_PALET1_LLENO        18 // GPIO18, LED externo (ON: HIGH, OFF: LOW)
-#define LED_PALET2_LLENO        19 // GPIO19, LED externo (ON: HIGH, OFF: LOW)
+#define LED_FUNCIONAMIENTO      2 // GPIO, LED integrado en la placa (ON: LOW, OFF: HIGH)
+#define LED_PALET1_LLENO        17 // GPIO, LED externo (ON: HIGH, OFF: LOW)
+#define LED_PALET2_LLENO        18 // GPIO, LED externo (ON: HIGH, OFF: LOW)
 
-// _________________ FALTA POR DEFINIR EL RESTO DE LEDS ______________________
 
 
 // BOTONES (INPUTS)
-#define BUTTON_VACIAR_PALET1        17 // GPIO38, Botón externo (PULSADO: LOW, NO PULSADO: HIGH)
-#define BUTTON_VACIAR_PALET2        39 // GPIO39, Botón externo (PULSADO: LOW, NO PULSADO: HIGH)
+#define BUTTON_VACIAR_PALET1        9 // GPIO, Botón externo (PULSADO: LOW, NO PULSADO: HIGH)
+#define BUTTON_VACIAR_PALET2        10 // GPIO, Botón externo (PULSADO: LOW, NO PULSADO: HIGH)
 
-#define AZULEJO_BUENO              40 // GPIO40, Botón externo que spawnea mediante el envío de MQTT un azulejo (PULSADO: LOW, NO PULSADO: HIGH)
-#define AZULEJO_MALO               41 // GPIO41, Botón externo que spawnea mediante el envío de MQTT un azulejo (PULSADO: LOW, NO PULSADO: HIGH)
-#define AZULEJO_DEFECTUOSO         42 // GPIO42, Botón externo que spawnea mediante el envío de MQTT un azulejo (PULSADO: LOW, NO PULSADO: HIGH)
+#define AZULEJO_BUENO              11 // GPIO, Botón externo que spawnea mediante el envío de MQTT un azulejo (PULSADO: LOW, NO PULSADO: HIGH)
+#define AZULEJO_MALO               12 // GPIO, Botón externo que spawnea mediante el envío de MQTT un azulejo (PULSADO: LOW, NO PULSADO: HIGH)
+#define AZULEJO_DEFECTUOSO         13 // GPIO, Botón externo que spawnea mediante el envío de MQTT un azulejo (PULSADO: LOW, NO PULSADO: HIGH)
 
 
-// ____________________ FALTA POR REVISAR TODOS LOS PINES _______________________
+
 
 
 

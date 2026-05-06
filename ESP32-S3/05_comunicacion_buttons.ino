@@ -36,27 +36,16 @@ void gestionarBoton(BotonMQTT& boton) {
 void on_loop() {
 
   static BotonMQTT botones[] = {
-    {AZULEJO_BUENO, BUTTON_SPAWN_TOPIC, "BUENO", HIGH, HIGH, 0},
-    {AZULEJO_MALO, BUTTON_SPAWN_TOPIC, "ROTO", HIGH, HIGH, 0},
-    {AZULEJO_DEFECTUOSO, BUTTON_SPAWN_TOPIC, "DEFECTUOSO", HIGH, HIGH, 0},
-    {BUTTON_VACIAR_PALET1, BUTTON_EMPTY_TOPIC, "PALET1", HIGH, HIGH, 0},
-    {BUTTON_VACIAR_PALET2, BUTTON_EMPTY_TOPIC, "PALET2", HIGH, HIGH, 0}
+    {AZULEJO_BUENO, BUTTON_SPAWN_TOPIC, "1", HIGH, HIGH, 0}, 
+    {AZULEJO_MALO, BUTTON_SPAWN_TOPIC, "2", HIGH, HIGH, 0},
+    {AZULEJO_DEFECTUOSO, BUTTON_SPAWN_TOPIC, "3", HIGH, HIGH, 0},
+    {BUTTON_VACIAR_PALET1, BUTTON_EMPTY_TOPIC, "1", HIGH, HIGH, 0},
+    {BUTTON_VACIAR_PALET2, BUTTON_EMPTY_TOPIC, "2", HIGH, HIGH, 0}
   };
 
   now = millis();
   if (now - lastMsg > sensorsUpdateInterval ) {
     lastMsg = now;
-    
-    //
-    // Read and process sensors
-    //
-/*
-    char tempString[8];
-    dtostrf(temperature, 1, 2, tempString);
-    Serial.print("Temperature: ");
-    Serial.println(tempString);
-    enviarMensajePorTopic("esp32/temperature", tempString);
-*/
 
   }
 

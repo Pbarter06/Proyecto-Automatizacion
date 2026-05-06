@@ -37,6 +37,10 @@ void alRecibirMensajePorTopic(char* topic, String incomingMessage) {
     info("WORKING: "); infoln("ON");
     digitalWrite(LED_FUNCIONAMIENTO, HIGH);
     }
+    else if (incomingMessage == "off") {
+      info("WORKING "); infoln("OFF");
+      digitalWrite(LED_FUNCIONAMIENTO, LOW);
+    }
     info("Mensaje en WORKING_TOPIC: "); infoln(incomingMessage);
   }
   else {
