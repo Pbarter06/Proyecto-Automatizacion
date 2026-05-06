@@ -193,10 +193,7 @@ Por último, para publicar el mensaje deseado se puede realizar de dos maneras d
   Este script es el cerebro que se encraga de interpretar el mensaje recibido y actúa en RoboDK.
   Su función principal es `def handle_message(mqtt_client, topic, mensaje, RDK)` que recibe el cliente MQTT, el topic por donde llegará el mensaje, el contenido del mismo y la conexión a RoboDK.
   Luego, se imprime el mensaje recibido a través de un `print` y se convierte el mensaje a número. En el caso de que el mensaje ya se tratase de un número no entraría en el bloque de código y no se modificaría nada.
-  Una vez que el mensaje se encuentra en el tipo de dato correspondiente se procede a la interpretación del mismo:
-  ```py
-
-  ```
+  Una vez que el mensaje se encuentra en el tipo de dato correspondiente se procede a la interpretación del mismo.
   El mensaje puede variar entre `1` y `2` . Si se recibe un `1` significa que se debe vaciar el palet 1, en caso contrario, el palet a vaciar sería el 2.
   - tipo == 1 :
      ```py
@@ -222,7 +219,23 @@ Por último, para publicar el mensaje deseado se puede realizar de dos maneras d
     El procedimiento a seguir es equivalente al anterior pero en el espacio de trabajo del palet 2.
   
  ### Recibir MQTT / Spawneo
+ En este script se encuentran similitudes con el script anterior, ya que ambos scripts llevan a cabo la imporatción de RoboDK y MQTT -al igual que todos los scripts generados- , realizan un Callback() a través de `on_message()`, se conectan al broker -obligatorio para su funcionamiento- y publican un mensaje "_ready_" para mostrar al sistema que todo está funcionando correctamente y puede ejecutar `loop_forever()`. Sin embargo, la gran diferencia entre ellos es que el scritp `RecibeMQTT_borrado` solo recibe mensajes MQTT a través del topic `sim/working/button/empty` y este segundo script, interpreta el mensaje y actúa en RoboDK a través del topic `sim/working/button/spawn`.
+ Por otra parte, otro aspecto a destacar es que en este script el controlador implementeaod es distinto. Antes se importaba:
+ ```py
+  import RobotControllerB as rc
+ ```
+ Pero, para la realización del spawn se importa este controlador:
+ ```py
+  import RobotControllerS as rc
+ ```
+  Este cambio se ha llevado a cabo porque este controlador no borra cajas ni ejecuta programas, solamenet actualiza un parámetro global denominado `TipoAzulejo`. Este parámetro lo usa CintaAzulejos para decidir lo siguiente:
+  - TipoAzulejo `1` : se trata de un azulejo en buen estado, por lo que avanza normal por la cinta.
+  - TipoAzulejo `2`: se trata de un azulejo defectuoso, por lo que de igual manera avanza con normlidad a lo alrgo de la cinta.
+  - TipoAzulejo `3`: se trata de un azulejo roto, por lo que avanza un espacio extra y se borra el azulejo.
+  Este parámetro es la base de la comunicación entre MQTT y las cintas.
 
+  En conclusión, el script leerMQTTS.py en su mayor porcentaje es equivalente al script leerMQTTB.py excepto por los topics con los que se trabaja y el controlador importado.
+ 
 ## Calidad de Vida
 
 ## Base de Datos
