@@ -5,24 +5,24 @@ SET search_path TO azulejos;
 -- CLIENTE
 -- ============================================
 CREATE TABLE cliente (
-    nif           VARCHAR(9) PRIMARY KEY,
-    telefono      VARCHAR(15) NOT NULL,
-    correo        VARCHAR(150) NOT NULL,
-    direccion     VARCHAR(100) NOT NULL
+    NIF           VARCHAR(9) PRIMARY KEY,
+    Telefono      VARCHAR(15) NOT NULL,
+    Correo        VARCHAR(150) NOT NULL,
+    Direccion     VARCHAR(100) NOT NULL
 );
 
 -- ============================================
 -- PEDIDO
 -- ============================================
 CREATE TABLE pedido (
-    codigo_compra   VARCHAR(10) PRIMARY KEY,
-    precio          REAL NOT NULL,
-    fecha_compra    DATE NOT NULL,
-    nif_cliente     VARCHAR(9) NOT NULL,
+    Codigo_compra   VARCHAR(10) PRIMARY KEY,
+    Precio          REAL NOT NULL,
+    Fecha_compra    DATE NOT NULL,
+    NIF_cliente     VARCHAR(9) NOT NULL,
 
     CONSTRAINT fk_pedido_cliente
-        FOREIGN KEY (nif_cliente)
-        REFERENCES cliente(nif)
+        FOREIGN KEY (NIF_cliente)
+        REFERENCES Cliente(NIF)
         ON UPDATE CASCADE
         ON DELETE RESTRICT
 );
@@ -31,35 +31,35 @@ CREATE TABLE pedido (
 -- CAJA LLENA
 -- ============================================
 CREATE TABLE caja_llena (
-    id_lote        VARCHAR(10) PRIMARY KEY,
-    tamano         REAL NOT NULL,
-    tipo           CHAR(12) NOT NULL,
-    codigo_compra  VARCHAR(10) NOT NULL,
+    ID_lote        VARCHAR(10) PRIMARY KEY,
+    Tamano         REAL NOT NULL,
+    Tipo           CHAR(12) NOT NULL,
+    Codigo_compra  VARCHAR(10) NOT NULL,
 
     CONSTRAINT ck_tipo
         CHECK (tipo IN ('roto', 'defectuoso', 'bueno')),
 
-    CONSTRAINT fk_caja_pedido
-        FOREIGN KEY (codigo_compra)
-        REFERENCES pedido(codigo_compra)
+    CONSTRAINT fk_Caja_Pedido
+        FOREIGN KEY (Codigo_compra)
+        REFERENCES Pedido(Codigo_compra)
         ON UPDATE CASCADE
         ON DELETE RESTRICT
 );
 
 -- ============================================
--- AZULEJOS
+-- AZULEJO
 -- ============================================
-CREATE TABLE azulejo (
-    n_serie   VARCHAR(10) PRIMARY KEY,
-    estado    CHAR(12) NOT NULL,
-    id_lote   VARCHAR(10) NOT NULL,
+CREATE TABLE Azulejo (
+    N_serie   VARCHAR(10) PRIMARY KEY,
+    Estado    CHAR(12) NOT NULL,
+    ID_lote   VARCHAR(10) NOT NULL,
 
-    CONSTRAINT ck_estado
-        CHECK (estado IN ('roto', 'defectuoso', 'bueno')),
+    CONSTRAINT ck_Estado
+        CHECK (Estado IN ('roto', 'defectuoso', 'bueno')),
 
-    CONSTRAINT fk_azulejo_caja
-        FOREIGN KEY (id_lote)
-        REFERENCES caja_llena(id_lote)
+    CONSTRAINT fk_Azulejo_Caja
+        FOREIGN KEY (ID_lote)
+        REFERENCES Caja_llena(ID_lote)
         ON UPDATE CASCADE
         ON DELETE RESTRICT
 );
@@ -67,42 +67,42 @@ CREATE TABLE azulejo (
 -- ============================================
 -- PROVEEDOR
 -- ============================================
-CREATE TABLE proveedores (
-    nif        VARCHAR(10) PRIMARY KEY,
-    telefono   VARCHAR(15) NOT NULL,
-    direccion  VARCHAR(100) NOT NULL,
-    correo     VARCHAR(150) NOT NULL
+CREATE TABLE Proveedor (
+    NIF        VARCHAR(10) PRIMARY KEY,
+    Telefono   VARCHAR(15) NOT NULL,
+    Direccion  VARCHAR(100) NOT NULL,
+    Correo     VARCHAR(150) NOT NULL
 );
 
 -- ============================================
 -- CAJA VACIA
 -- ============================================
-CREATE TABLE caja_vacia (
-    n_lote   VARCHAR(10) PRIMARY KEY,
-    tamano   INT NOT NULL
+CREATE TABLE Caja_Vacia (
+    N_lote   VARCHAR(10) PRIMARY KEY,
+    Tamano   INT NOT NULL
 );
 
 -- ============================================
 -- COMPRA
 -- ============================================
-CREATE TABLE compra (
-    nif_proveedor   VARCHAR(10) NOT NULL,
-    n_lote          VARCHAR(10) NOT NULL,
-    fecha_compra    DATE NOT NULL,
-    precio_final    REAL NOT NULL,
+CREATE TABLE Compra (
+    NIF_proveedor   VARCHAR(10) NOT NULL,
+    N_lote          VARCHAR(10) NOT NULL,
+    Fecha_compra    DATE NOT NULL,
+    Precio_final    REAL NOT NULL,
 
-    CONSTRAINT pk_compra
-        PRIMARY KEY (nif_proveedor, n_lote, fecha_compra),
+    CONSTRAINT pk_Compra
+        PRIMARY KEY (NIF_proveedor, N_lote, Fecha_compra),
 
-    CONSTRAINT fk_compra_proveedor
-        FOREIGN KEY (nif_proveedor)
-        REFERENCES proveedor(nif)
+    CONSTRAINT fk_Compra_Proveedor
+        FOREIGN KEY (NIF_Proveedor)
+        REFERENCES Proveedor(NIF)
         ON UPDATE CASCADE
         ON DELETE RESTRICT,
 
-    CONSTRAINT fk_compra_caja
-        FOREIGN KEY (n_lote)
-        REFERENCES caja_vacia(n_lote)
+    CONSTRAINT fk_Compra_Caja
+        FOREIGN KEY (N_lote)
+        REFERENCES Caja_vacia(N_lote)
         ON UPDATE CASCADE
         ON DELETE RESTRICT
 );
