@@ -111,6 +111,117 @@ Como la estructura aplicada en el programa `resetCinta.py` es equivalente en tod
   Cuando por la cinta avaza un azulejo cuyo estado es roto, éste tiene una implementación especial. Cuando sucede esta eventualidad, la cinta avanza un poco más y luego, una vez el azulejo llega a la zona de la papelera -situada al final de la cinta- se borra el azulejo y se limpia la pista de la cinta. Una vez se haya cumplido estos pasos de manera correcta, se reinicia el ciclo y se vuelve a generar de nuevo un azulejo mediante la instrucción `azulejo = spawnear_azulejo()`.
   
 ## MQTT
+Para conseguir una comunicación exitosa se requiere de 3 fases principales de la comunicación a través del broker MQTT:
+1. Enviar MQTT
+2. Recibir MQTT de borrado
+3. Recibir MQTT de spawneo
+
+ ### Enviar MQTT
+ Principalmente hay 3 scripts que son los encargados de publicar en MQTT:
+ - Scripts que publican en `sim/working`
+ - Scripts que publican en `sim/working/palet1`
+ - Scripts que publidan en `sim/working/palet2`
+
+La estructura general que se siguen en los scripts de ON/OFF es la siguiente:
+```py
+import paho.mqtt.client as mqtt
+
+broker = "broker.emqx.io"
+port = 1883
+topic_destino = "..."
+
+mqttc = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+mqttc.connect(broker, port, 60)
+
+mensaje = "on"  # o "off"
+mqttc.publish(topic_destino, mensaje)
+
+mqttc.disconnect()
+```
+Al igual que en todos los casos anteriores, lo primero que se realiza es la importación de la librería correspondiente. En este caso se trara de la librería oficial de Python para MQTT. Esta librería permite crear clientes, conectarse a un broker y publicar mensajes. Pero para ello, se debe realizar una configuración adecuada. 
+Con respecto a la configuración se debe tener en cuenta los siguientes parámetros:
+- `broker.emqx.io` : se trata de un broker público.
+- `port = 1883` : puesto estándar MQTT sin cifrado.
+  
+Una vez se ha realizado bien la configuración, se definen los topics anteriormente menncionados. Estos topics determinan a qué canal MQTT se envía el mensaje. No obstante, para enviar el mensaje previamente s edebe crear el cliente MQTT de la siguiente maner:
+```py
+mqttc = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+
+```
+Gracias a esta línea de código se crea el cliente y el parámetro `VERSION2` se trata de la API moderna de _CallBacks_.
+Lo siguiente a tener en cuenta es la conexión del broker. Para ello, dentro de la función `mqtt.connect()` se introducen los parámetros de broker, port y 60. Este último parámetro es el **keep-alive**, en otras palabras, el tiempo másximo sin actividad.
+Por último, para publicar el mensaje deseado se puede realizar de dos maneras diferentes:
+- Manera 1:
+  ```py
+  mensaje = "on"
+  mqttc.publish(topic_destino, mensaje)
+  ```
+  
+- Manera 2:
+  ```py
+  mensaje = "off"
+  mqttc.publish(topic_destino, mensaje)
+  ```
+  Publica el mensaje en el topic deseado.
+
+  Para finalizar, se debe realizar el cierre con la conexión de manera correcta para evitar posibles conflictos.
+  
+ ### Recibir MQTT // Borrado
+ En esta fase de comunicación MQTT cuenta con dos scripts a comentar
+
+  #### LeerMQTTB.py
+  Este script es el receptor MQTT que escucha mensajes y los pasa al controlador.
+  Al inicio, como de costumbre se importa la API de RoboDK y las librerías requeridas para el proceso que se va a llevar a cabo. No obstante, además se importa el módulo `RobotControllerB.py` que contiene la lógica de respuesta. Luego, se configura el broker de igual manera que en los scripts anteriores, pero conla modificación de que se trata del topic donde este script escucha mensajes.
+  ```py
+  def on_message(mqttc, obj, msg):
+    payload = msg.payload.decode('utf-8')
+    topic = msg.topic
+    qos = msg.qos
+    rc.handle_message(mqttc, topic, payload, RDK)
+  ```
+  Este bloque de código representa el _Callback_ y cómo funciona internamente el proceso cuando se recibe un mensaje. El `payload` es el contenido del mensaje recibido a través del topic correspondiente. Mientras que el parámetro `qos` representa la calidad del servicio. Luego, se llama a `handle_menssage()` del controlador, pasándole el cliente MQTT, el topic, el mensaje y el objeto RDK para manipular RoboDK.
+  Cabe aclarar que este script no toma decisiones ni envía mensajes, solamente se centra en recibir y delegar la información que le llega.
+
+  Al mismo tiempo, se crea el cliente MQTT y se le asigna la función `on_message` como callback. Así mismo, se conecta al broker y se suscribe al topic `sim/working/button/empty`se la siguiente manera:
+  ```py
+  mqttc.connect(broker, port, 60)
+  mqttc.subscribe(base_topic, 0)
+  ```
+  Para luego publicar el mensaje "_ready_" que informa al sistema de que el receptor está activo. Y por último, pero de vital importancia, se debe mantener el cliente escuchando infinitamente los mensajes que se reciban a través de un bucle infinito.
+  
+  #### RobotControllerB.py
+  Este script es el cerebro que se encraga de interpretar el mensaje recibido y actúa en RoboDK.
+  Su función principal es `def handle_message(mqtt_client, topic, mensaje, RDK)` que recibe el cliente MQTT, el topic por donde llegará el mensaje, el contenido del mismo y la conexión a RoboDK.
+  Luego, se imprime el mensaje recibido a través de un `print` y se convierte el mensaje a número. En el caso de que el mensaje ya se tratase de un número no entraría en el bloque de código y no se modificaría nada.
+  Una vez que el mensaje se encuentra en el tipo de dato correspondiente se procede a la interpretación del mismo:
+  ```py
+
+  ```
+  El mensaje puede variar entre `1` y `2` . Si se recibe un `1` significa que se debe vaciar el palet 1, en caso contrario, el palet a vaciar sería el 2.
+  - tipo == 1 :
+     ```py
+     if not prog1.Valid():
+     print("Error: No se encontró el programa 'Palet1OFF'")
+     return
+     ```
+     Lo primero es la gestión de errores. Es por ello por lo que se verifica si el programa existe.
+     ```py
+     for item in lista_palet1:
+     if item.Valid() and item.Name().startswith('cajaC'):
+         item.Delete()
+     RDK.setParam('x3', 0)
+    RDK.setParam('y3', 0)
+    RDK.setParam('z3', 0)
+    RDK.setParam('LuzPalet1', 0)
+     ```
+     Lo segundo a realizar es el borrado de todas las cajas del palet 1, para luego resetear los parámetros. En otros términos, se resetea las coordenasad y luz del palet para por último, ejecutar el programa de RoboDk de la siguiente manera:
+     ```py
+     resultado = prog1.RunProgram()
+     ```
+  - tipo == 2:
+    El procedimiento a seguir es equivalente al anterior pero en el espacio de trabajo del palet 2.
+  
+ ### Recibir MQTT / Spawneo
 
 ## Calidad de Vida
 
