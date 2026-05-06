@@ -18,7 +18,7 @@ VALUES
 -- ============================================
 -- 2. CAJA VACÍA
 -- ============================================
-INSERT INTO Cajas_vacia (N_lote, Tamano)
+INSERT INTO Caja_vacia (N_lote, Tamano)
 VALUES
 ('V-PEQ', 10), ('V-MED', 25), ('V-GRA', 50), ('V-IND', 100),
 ('V-XTRA', 200), ('V-MUESTR', 5), ('V-ZOC', 15);
@@ -80,7 +80,7 @@ VALUES
 -- ============================================
 -- 6. CAJA LLENA
 -- ============================================
-INSERT INTO Cajas_llenas (ID_lote, Tamano, Tipo, Codigo_Compra)
+INSERT INTO Caja_llena (ID_lote, Tamano, Tipo, Codigo_Compra)
 VALUES
 ('L-001', 100, 'bueno', 'P25-001'), ('L-002', 100, 'bueno', 'P25-001'),
 ('L-003', 25, 'bueno', 'P25-002'), ('L-004', 10, 'defectuoso', 'P25-003'),
