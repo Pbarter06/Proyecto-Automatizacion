@@ -98,3 +98,61 @@ La base de datos modela el flujo de factores externos con el paletizado, empaque
   En esta última tabla definida se almacena el historial de compras de cajas vacías a proveedores.
   
   ## poblar_azulejos.sql
+  El fichero `poblar_azulejos.sql` contiene el conjunto de instrucciones SQL necesarias para insertar datos reales en todas las tablas del esquema. Su objetivo es proporcionar un conjunto de datos coherente y completo. Este fichero ha sido realizado en gran mayoría con la ayuda de la Inteligencia Artificial.
+   Al igual que el anteriore fichero, éste se ha organizado en 7 secciones, cada una correspondiente a una tabla del modelo.
+
+  ### PROVEEDORES
+  ```sql
+  INSERT INTO Proveedor (NIF, Telefono, Direccion, Correo)
+  VALUES
+  ```
+  En esta sección de código se insertan 9 proveedores reales, con datos completos:
+    - NIF
+    - Teléfono
+    - Dirección
+    - Correo Electrónico
+  Estos proveedores suministran las cajas vacías que posteriormente se llenarán de azulejos.
+
+### CAJA_VACÍA
+```sql
+INSERT INTO Caja_Vacia(N_Lote, Tamano)
+VALUES
+```
+Así pues, en este casos se insertan 7 cajas. Estas cajas son las unidades básicas que se compran a proveedores.
+
+### COMPRA
+Se registra un historial apliado de compras donde se almacena el proveedor, el lote comprado, su fecha y el precio final. Cada compra debe cumplir:
+  - `NIF_Proveedor`
+  - `N_Lote`
+
+### CLIENTE
+```sql
+INSERT INTO Cliente (NIF, Telefono, Correo, DIreccion)
+VALUES
+```
+De igual manera, se insertan 10 clientes, cada uno con su correspondiente `NIF`, `Teléfono`, `Correo`y `Dirección`. estos clientes serán los destinatarios de los pedidos.
+
+### PEDIDO
+```sql
+INSERT INTO Pedido (codigo_compra, Precio, Fecha_compra, NIF_Cliente)
+VALUES
+```
+Aquí, se insertan 13 pedidos, cada uno asociado a un cliente.
+
+### CAJA_LLENA
+```sql
+INSERT INTO Caja_Llena(ID_Lote, Tamano, Tipo, Código_compra)
+VALUES
+```
+Se insertan 17 cajas llenas, clasificadas por:
+  - Tamaño
+  - Tipo
+  - Pedido al que pertenecen
+  - Código_compra
+
+### AZULEJOS
+```sql
+INSERT INTO Azulejo (N_Serie, Estado, ID_Lote)
+VALUES
+```
+Finalmente, se insertan más de 70 azulejos individuales, cada uno con su respectivo número de serie, estado, lote al que pertenecen y ID. Asimismo, los azulejos están organizados por lotes según el estado en el que se encuentren.
