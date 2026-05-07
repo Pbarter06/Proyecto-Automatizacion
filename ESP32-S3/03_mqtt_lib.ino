@@ -2,7 +2,32 @@
 
 PubSubClient mqttClient(espWifiClient);
 
-// MQTT CONFIG
+#define MQTT_DEDUPE_SIZE 32
+static uint32_t mqtt_dedupe_buffer[MQTT_DEDUPE_SIZE];
+static int mqtt_dedupe_idx = 0;
+
+// Deduplicador MQTT (mínimo, buffer circular de hashes recientes)
+static uint32_t djb2_hash(const char* str) {
+  uint32_t hash = 5381;
+  int c;
+  while ((c = *str++)) {
+    hash = ((hash << 5) + hash) + (uint8_t)c; /* hash * 33 + c */
+  }
+  return hash;
+}
+
+// Devuelve true si el hash se vio recientemente; si no, lo almacena y devuelve false
+static bool mqtt_seen_recent(uint32_t h) {
+  for (int i = 0; i < MQTT_DEDUPE_SIZE; ++i) {
+    if (mqtt_dedupe_buffer[i] == h) return true;
+  }
+  // almacenar en el índice actual
+  mqtt_dedupe_buffer[mqtt_dedupe_idx++] = h;
+  if (mqtt_dedupe_idx >= MQTT_DEDUPE_SIZE) mqtt_dedupe_idx = 0;
+  return false;
+}
+
+// CONFIGURACIÓN MQTT
 const char* mqttServerIP = MQTT_SERVER_IP;
 unsigned int mqttServerPort = MQTT_SERVER_PORT;
 String mqttClientID;
@@ -39,7 +64,7 @@ void mqtt_reconnect(int retries) {
   if ( !mqttClient.connected() )
     warnln("Disconnected from the MQTT broker");
 
-  // Loop until we're reconnected, or a number of retries ...
+  // Bucle hasta que nos reconectemos, o se alcance el número de reintentos...
   int r=0;
   while (!mqttClient.connected() && r<retries) {
     r++;
@@ -53,7 +78,7 @@ void mqtt_reconnect(int retries) {
     traceln("' ... ");
 
 
-    // Attempt to connect
+    // Intentar conectar
     // boolean connect (clientID, [username, password], [willTopic, willQoS, willRetain, willMessage], [cleanSession])
 
     if ( mqttClient.connect(mqttClientID.c_str()) ) {
@@ -64,7 +89,7 @@ void mqtt_reconnect(int retries) {
       debug("-X- failed, rc=");
       debugln(mqttClient.state());
       debugln("-R-   re-trying in 5 seconds");
-      // Wait 5 seconds before retrying
+      // Esperar 5 segundos antes de reintentar
       delay(5000);
     }
   }
@@ -78,6 +103,16 @@ void mqttCallback(char* topic, byte* message, unsigned int length) {
   String incomingMessage;
   for (int i = 0; i < length; i++) {
     incomingMessage += (char)message[i];
+  }
+
+  // Deduplícación: calcular hash de topic + payload e ignorar duplicados recientes
+  String combo = String(topic);
+  combo += '|';
+  combo += incomingMessage;
+  uint32_t h = djb2_hash(combo.c_str());
+  if ( mqtt_seen_recent(h) ) {
+    trace("-- Ignorando mensaje MQTT duplicado (reciente)");
+    return;
   }
 
   traceln("<<~~ RECEIVING an MQTT message:");
