@@ -23,7 +23,7 @@ Primeramente, se define un identificador único del dispositivo a partir de la M
   ```cpp
   wifi_connect();
   ```
-  EL siguiente paso para un buen funcionamiento es la conexión WiFi. En este caso, se llama a la función definida en `wifi_lib.ino` donde se configura la interfaz y se intenta conectar.
+  El siguiente paso para un buen funcionamiento es la conexión WiFi. En este caso, se llama a la función definida en `wifi_lib.ino`, donde se configura la interfaz y se intenta conectar.
   
   ```cpp
   mqtt_connect(deviceID);
@@ -33,7 +33,7 @@ Primeramente, se define un identificador único del dispositivo a partir de la M
   ```cpp
   suscribirseATopics();
   ```
-  Esta línea de código implica la llamada a la función definida previamente en el fichero `05_comunicacion_buttons.ino`. Es en esta función donde se añaden todos los topics que la ESP32-S3 debe escuchar o utilizar para enviar mensajes.
+  Esta línea de código implica la llamada a la función definida en el fichero `06_comunicacion_leds.ino`. Es en esta función donde se añaden los topics que la ESP32-S3 debe suscribir para recibir mensajes del sistema.
 
   ```cpp
   on_setup();
@@ -65,7 +65,7 @@ En segundo lugar, si esta línea de código está activa se habilita el sistema 
 ```cpp
 #define LOG_LEVEL TRACE
 ```
-A continuación, se define el nivel de severidad mínimo que se mostrará. En este caso, al tratarse de `TRACE` se trata de un nivel más detalado lo que permite ver absolutamente todos los mensajes.
+A continuación, se define el nivel de severidad mínimo que se mostrará. En este caso, al tratarse de `TRACE`, se trata de un nivel más detallado, lo que permite ver absolutamente todos los mensajes.
 
 ```cpp
 #define DEVICE_GIIROB_PR2_ID "00"
@@ -108,7 +108,7 @@ Estos son los topics usados por el sistema actual:
 Por último, se definen los pines físicos de los LEDs internos y externos de la ESP32-S3. El de funcionamiento se utiliza en `04_funciones.ino` y `07_setup.ino`, y los de palets en `06_comunicacion_leds.ino`.
 
  ## 01_logger.ino
-Este fichero implementa un módulo de registro que permite mostrar mensajes por la terminar con distintas informaciones. Este sistema es fundamentañ àra depurar el comportamiento del firmware. 
+Este fichero implementa un módulo de registro que permite mostrar mensajes por la terminal con distinta información. Este sistema es fundamental para depurar el comportamiento del firmware.
 
 En primer lugar, se han definido los niveles de log. Estos valores numéricos representan la prioridad de cada nivel:
 - `TRACE(6)`: nivel más detallado.
@@ -117,7 +117,7 @@ En primer lugar, se han definido los niveles de log. Estos valores numéricos re
 - `WARN(3)`: advertencias
 - `ERROR(2)`: errores recuperables.
 - `FATAL(1)`: errores críticos.
-- `NONE(0)`: descativa completamente el logging.
+- `NONE(0)`: desactiva completamente el logging.
 
 El nivel activo se define en `Config.h`:
 ```cpp
@@ -135,7 +135,7 @@ bool _log_newline = true;
 ```
 En el caso de esta variable, es la encargada de controlar si se debe imprimir la etiqueta del nivel (`[INFO]`, `[ERROR]`, etc.) antes del mensaje.
 - `_log_newline == true ` : se imprime la etiqueta.
-- `_log_newline == flase` : el mensaje anterior no terminó en salto de línea, por lo que no se repite la etiqueta.
+- `_log_newline == false` : el mensaje anterior no terminó en salto de línea, por lo que no se repite la etiqueta.
 
 ```cpp
 #define info(message)    if ( LOG_LEVEL >= INFO  ) { if (_log_newline) Serial.print("[ INFO] "); Serial.print(message);   _log_newline = false;}
@@ -174,7 +174,7 @@ Lo que se busca con estas líneas de código es tomar el SSID y la contraseña q
       wifi_reconnect(WIFI_CONNECTION_TIMEOUT_SECONDS);
   }
   ```
-  Esta función se ejecuta en cada iteración del loop principal. Su principal objetivo es detectar si la ESP32-S3 ha perdido la conexión y si es el caso, intentar reconetar automáticamente.
+  Esta función se ejecuta en cada iteración del loop principal. Su principal objetivo es detectar si la ESP32-S3 ha perdido la conexión y, si es el caso, intentar reconectar automáticamente.
 
   ### wifi_connect()
   ```cpp
@@ -209,7 +209,7 @@ Lo que se busca con estas líneas de código es tomar el SSID y la contraseña q
     trace(".");
   }
   ```
-  Esta sección de código espera hasta conectarse o agortar los intentos; luego, imprime puntos para indicar progreso.
+  Esta sección de código espera hasta conectarse o agotar los intentos; luego, imprime puntos para indicar progreso.
   Si conecta correctamente se muestra la IP asignada. 
 
   ```cpp
@@ -362,51 +362,93 @@ Lo primero a realizar es declarar una variable global (entero sin signo de 8 bit
     - El LED de funcionamiento es activo en LOW.
 
 ## 05_comunicacion_buttons.ino
-Este fichero contiene las funciones que gestionan:
-- Lectura de botones físicos.
-- Publicación de mensajes MQTT asociados a cada pulsación.
-  
-  ### void enviarMensajePorTopic(const char* topic, String outgoingMessage):
-  ```cpp
-  void enviarMensajePorTopic(const char* topic, String outgoingMessage){
-    mqtt_publish(topic, outgoingMessage.c_str());
-  }
-  ```
-  Esta función es la encargada de publicar un mensaje a través de un canal MQTT. Convierte el `String` a `const char*` para la librería MQTT.
+Este fichero contiene las funciones que gestionan la lectura de botones físicos y la publicación de mensajes MQTT asociados a cada pulsación. Es la interfaz de entrada del operario hacia el sistema de automatización.
 
-  El bloque principal del fichero implementa un debounce de 50 ms y publica distintos payloads según el botón pulsado:
-  - `AZULEJO_BUENO` publica `"1"` en `BUTTON_SPAWN_TOPIC`.
-  - `AZULEJO_MALO` publica `"2"` en `BUTTON_SPAWN_TOPIC`.
-  - `AZULEJO_DEFECTUOSO` publica `"3"` en `BUTTON_SPAWN_TOPIC`.
-  - `BUTTON_VACIAR_PALET1` publica `"1"` en `BUTTON_EMPTY_TOPIC`.
-  - `BUTTON_VACIAR_PALET2` publica `"2"` en `BUTTON_EMPTY_TOPIC`.
-  
-Este fichero contiene únicamente la función `on_loop()`, la cual representa la parte del programa que se ejecuta de manera repetitiva durante todo el proceso de ejecución.
+### Estructura General
+El fichero define un conjunto de pines de entrada asociados a botones y realiza un debounce de 50 ms para evitar lecturas falsas. Cada botón pulsado genera un mensaje MQTT que se envía al broker para que otros sistemas (RoboDK, robots, cintas) ejecuten las acciones correspondientes.
+
+### void enviarMensajePorTopic(const char* topic, String outgoingMessage)
+```cpp
+void enviarMensajePorTopic(const char* topic, String outgoingMessage){
+  mqtt_publish(topic, outgoingMessage.c_str());
+}
+```
+Esta función es la encargada de publicar un mensaje a través de un canal MQTT. Convierte el `String` a `const char*` para compatibilidad con la librería de MQTT.
+
+### Botones y Payloads
+El firmware monitoriza continuamente los botones físicos configurados en `buttons.h` y, al detectar una pulsación (tras aplicar debounce), publica el siguiente payload según el botón:
+- `AZULEJO_BUENO` → publica `"1"` en `BUTTON_SPAWN_TOPIC` (genera un azulejo de buen estado).
+- `AZULEJO_MALO` → publica `"2"` en `BUTTON_SPAWN_TOPIC` (genera un azulejo defectuoso).
+- `AZULEJO_DEFECTUOSO` → publica `"3"` en `BUTTON_SPAWN_TOPIC` (genera un azulejo roto).
+- `BUTTON_VACIAR_PALET1` → publica `"1"` en `BUTTON_EMPTY_TOPIC` (ordena vaciar el palet 1).
+- `BUTTON_VACIAR_PALET2` → publica `"2"` en `BUTTON_EMPTY_TOPIC` (ordena vaciar el palet 2).
+
+Estos mensajes son interpretados por RoboDK para activar los robots y ejecutar las secuencias de empaquetado y paletizado correspondientes.
+
+### Función `on_loop()` dentro de `05_comunicacion_buttons.ino`
+Además de la gestión de botones, este fichero incluye la función `on_loop()`, que se ejecuta de forma periódica dentro del `loop()` principal del firmware.
 
 ```cpp
 long now = 0, lastMsg = 0;
 long sensorsUpdateInterval = 5000;
 ```
-  ### now
-  Esta variable es la encargada de guardar el tiempo actual en milisegundos desde que la ESP32-S3 se encendió. Esto se obtiene a través de `millis()`.
-  
-  ### lastMsg
-  Esta variable guarda el instante en el que se ejecutó por última vez la tarea periódica.
-  Se inicializa a 0.
-  
-  ### sensorsUpdateInterval
-  En el caso de esta variable se trata de una variable que representa el intervalo de actualización en milisegundos. Al estar igualado a 5000 milisegundos, equivalente a 5 segundos, indica que la tarea periódica se ejecutará cada 5 segundos.
 
-  En la versión actual, además de mantener esta temporización, la función realiza tareas periódicas del sistema como lectura de botones y actualización de estado. Los botones definidos en `buttons.h` se procesan en `05_comunicacion_buttons.ino`.
+- `now`: guarda el tiempo actual en milisegundos (usando `millis()`).
+- `lastMsg`: almacena el instante de la última ejecución periódica.
+- `sensorsUpdateInterval`: define el intervalo de ejecución (5000 ms).
+
+Esta lógica permite realizar comprobaciones y procesamiento de botones sin bloquear la ejecución general del sistema.
 
 ## 06_comunicacion_leds.ino
-Este fichero contiene la función `alRecibirMensajePorTopic()`, que se encarga de interpretar los mensajes MQTT recibidos en diferentes topics y controlar los LEDs correspondientes. Reacciona a mensajes de actualización de estado de palets y controla los indicadores visuales del sistema.
+Este fichero contiene la función `alRecibirMensajePorTopic()`, que actúa como el manejador de mensajes MQTT entrantes. Su propósito es interpretar los mensajes recibidos en diferentes topics y ejecutar las acciones correspondientes, principalmente el control de LEDs indicadores del estado de los palets.
+
+### Función alRecibirMensajePorTopic(const char* topic, String mensaje)
+Esta función se invoca automáticamente desde el callback MQTT (`mqttCallback` en `03_mqtt_lib.ino`) cada vez que llega un mensaje a un topic suscrito.
+
+**Parámetros:**
+- `topic`: cadena con el nombre del topic donde llegó el mensaje.
+- `mensaje`: contenido del mensaje MQTT (payload).
+
+### Topics Monitoreados y Acciones
+El fichero interpreta los siguientes topics:
+
+- **`sim/working/palet1`**: Recibe instrucciones para controlar el LED de estado del palet 1.
+  - Payload `"1"`: Enciende `LED_PALET1_LLENO` (palet lleno, listo para retirar).
+  - Payload `"0"`: Apaga `LED_PALET1_LLENO` (palet vacío o en uso).
+
+- **`sim/working/palet2`**: Recibe instrucciones para controlar el LED de estado del palet 2.
+  - Payload `"1"`: Enciende `LED_PALET2_LLENO` (palet lleno, listo para retirar).
+  - Payload `"0"`: Apaga `LED_PALET2_LLENO` (palet vacío o en uso).
+
+- **`sim/working`**: Recibe instrucciones para controlar el LED de funcionamiento general del sistema.
+  - Payload `"1"`: Enciende `LED_FUNCIONAMIENTO` (sistema activo).
+  - Payload `"0"`: Apaga `LED_FUNCIONAMIENTO` (sistema inactivo o en pausa).
+
+### Flujo de Comunicación
+```
+RoboDK/Python (publica estado) 
+    ↓
+Broker MQTT (distribuye mensajes)
+    ↓
+ESP32-S3 (suscrita a topics)
+    ↓
+alRecibirMensajePorTopic() (interpreta)
+    ↓
+setInternalLed() o digitalWrite() (controla LEDs)
+    ↓
+Indicadores visuales (muestran estado del sistema)
+```
+
+### Integración con Operario
+Los LEDs controlados por este módulo proporcionan retroalimentación visual en tiempo real:
+- **LED_FUNCIONAMIENTO**: Indica si el sistema de automatización está operativo.
+- **LED_PALET1_LLENO y LED_PALET2_LLENO**: Informan al operario cuándo los palets están llenos y listos para retirada.
 
 ## 07_setup.ino
 La finalidad de este fichero es inicializar los recursos de la ESP32-S3 y dejar el sistema en un estado conocido al arrancar.
 
   ### on_setup()
-  Esta función solamente se ejecutará una vez tras la incialización del sistema.
+  Esta función solamente se ejecutará una vez tras la inicialización del sistema.
   
   ```cpp
   pinMode(LED_FUNCIONAMIENTO, OUTPUT);
