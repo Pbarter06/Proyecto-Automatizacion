@@ -308,10 +308,15 @@ for item in lista_caja3:
 Por último, para el borrado de azulejos en el escenario de la herramienta del cobot se ha utilizado una implementación similar. Lo único a destacar es que se recorren todos los objetos -al igual que en los casos anteriores- que se encuentran en la ventosa. 
 
 ## Base de Datos
-Este script permite conectarse a PostgreSQL e insertar un azulejo y una caja llena en sus tablas correspondientes.
-Al igual que en los scripts anteriores, éste también requiere de la importación de la librería aunque en este caso la de PostgreSQL. Luego, para que se pueda conectar y interactuar con RoboDK se abre una conexión con PostgreSQl mediante `psycopg.connect()`. Esta función recibe como parámetros `dbname` como nombre de la base de datos, `user` como usuario de PostgreSQL con su respectiva contraseña. Y cuenta también con un `host` y `port` que hacen referencia al servidor (local) y el puerto etsándar de PostgreSQL respectivamente. Si la conexión funciona, imprime un mensaje de éxito. 
+En la versión actual del proyecto, la lógica de base de datos no está centralizada en un único script independiente, sino integrada directamente en los programas de avance de las cintas de salida: `ProgramasPython/CINTAS/Cinta3/AvanceCinta3.py` y `ProgramasPython/CINTAS/CInta4/AvanceCinta4.py`. De esta forma, cada vez que se completa el ciclo de detección y gestión de una caja, el propio script registra automáticamente el evento en PostgreSQL.
+
+Al igual que en los demás módulos, primero se importan las librerías necesarias y, en este caso, se añade `psycopg` para la conexión con PostgreSQL. Cuando se cumple la condición de proceso (`Done == 1`), se abre la conexión con `psycopg.connect()` indicando los parámetros de conexión (`dbname`, `user`, `password`, `host` y `port`). A continuación, se crea el cursor con `cur = conn.cursor()`, que es el objeto encargado de ejecutar sentencias SQL.
+
+Después del movimiento de cinta, la detección por fotocélula y el respawn de la caja, el script obtiene el contador de lote desde RoboDK (`Lote1` o `Lote2`) y construye identificadores de trazabilidad. Con esos datos se ejecuta un `INSERT` parametrizado sobre la tabla `Caja_llena`:
 ```sql
-cur = conn.cursor()
+INSERT INTO Caja_llena (ID_lote, Tamano, Tipo, Codigo_Compra)
+VALUES (%s, %s, %s, %s)
 ```
-El siguiente paso es crear un cursor. El cursor es el objeto que permite ejecutar sentencias SQL. Todo lo que se inserte, se borre o se consulte se realiza a través de él.
-Los últimos pasos a realizar son las instrucciones INSERT en la tabla Azulejo y en Caja_Llena.
+Esta inserción guarda, al menos, el identificador de lote, el tamaño de caja, el tipo de producto y el código de compra asociado. Finalmente, se confirma la transacción con `conn.commit()`, se incrementa el contador de lote dentro de RoboDK (`RDK.setParam('Lote1', ...)` o `RDK.setParam('Lote2', ...)`) y se cierran correctamente cursor y conexión (`cur.close()` y `conn.close()`).
+
+Esta integración aporta dos ventajas clave: por un lado, el registro queda sincronizado con el estado real de la simulación y, por otro, se garantiza la trazabilidad del flujo de cajas en tiempo real. Así, cada caja gestionada en las cintas 3 y 4 queda persistida en base de datos como evidencia del proceso de paletizado y control de producción.
