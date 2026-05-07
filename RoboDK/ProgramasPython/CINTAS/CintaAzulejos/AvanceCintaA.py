@@ -1,6 +1,17 @@
 import time
 from robodk import robolink    # RoboDK API
 from robodk import robomath
+import psycopg 
+
+conn = psycopg.connect(
+    dbname = "proyecto",
+    user = "postgres",
+    password = "GDI.2026",
+    host = "localhost",
+    port = "5432"
+)
+cur = conn.cursor()
+
 RDK = robolink.Robolink()
 
 azulejo = RDK.Item('Azulejo')
@@ -28,7 +39,15 @@ def spawnear_azulejo():
     
     return nuevo_azulejo
 
-while(True):
+def formatear_serie(numero_serie):
+    bloque_serie = ((numero_serie - 1) // 999) + 1
+    numero_en_bloque = ((numero_serie - 1) % 999) + 1
+    return f"S{bloque_serie}-{numero_en_bloque:03d}"
+
+serie_inicial = int(RDK.getParam('SerieInicial'))
+total_azulejos_a_insertar = int(RDK.getParam('TotalAzulejos'))
+
+for i in range(total_azulejos_a_insertar):
     lista_azulejos = frame.Childs()
     detectado = False
 
@@ -64,3 +83,35 @@ while(True):
 
     cinta.setJoints([0])
     azulejo = spawnear_azulejo()
+
+    tipo = RDK.getParam('TipoAzulejos')
+    lote1 = RDK.getParam('Lote1')
+    lote2 = RDK.getParam('Lote2')
+
+
+    if tipo == 1:
+        estado = 'bueno'
+        lote_aux = lote1
+    elif tipo == 2:
+        estado = 'defectuoso'
+        lote_aux = lote2
+    elif tipo == 3:
+        estado = 'roto'
+        lote_aux = -1
+
+        
+    #GDI
+
+    numero_serie = serie_inicial + i
+    serie = formatear_serie(numero_serie)
+    lote = f"L-{lote_aux:03d}"
+
+    sql = """INSERT INTO Azulejo (N_serie, Estado, ID_lote)
+    VALUES (%s, %s, %s)"""
+    datos = (serie, estado, lote)
+    cur.execute(sql, datos)
+    conn.commit()
+
+
+cur.close()
+conn.close()
