@@ -162,7 +162,7 @@ long now = 0, lastMsg = 0;
 long sensorsUpdateInterval = 5000;
 ```
   ### now
-  Esta variable es la encargada de guardar el tiempo actual en milisegundos desde que la ESP32-S3 se encendió. Esto se obtiene a través de `milis()`.
+  Esta variable es la encargada de guardar el tiempo actual en milisegundos desde que la ESP32-S3 se encendió. Esto se obtiene a través de `millis()`.
   
   ### lastMsg
   Esta variable guarda el instante en el que se ejecutó por última vez la tarea periódica.
@@ -171,7 +171,7 @@ long sensorsUpdateInterval = 5000;
   ### sensorsUpdateInterval
   En el caso de esta variable se trata de una variable que representa el intervalo de actualización en milisegundos. Al estar igualado a 5000 milisegundos, equivalente a 5 segundos, indica que la tarea periódica se ejecutará cada 5 segundos.
 
-  En la versión actual, además de mantener esta temporización, la función lee los botones definidos en `buttons.h` y publica eventos MQTT al pulsarlos.
+  En la versión actual, además de mantener esta temporización, la función realiza tareas periódicas del sistema como lectura de botones y actualización de estado. Los botones definidos en `buttons.h` se procesan en `05_comunicacion_buttons.ino`.
   
 ## ESP32-S3.ino
 Este fichero se trata del fichero que contiene la estructura principal del programa. Su función es inicializar el sistema, configurar las comunicaciones WiFi y MQTT.
@@ -222,7 +222,17 @@ Primeramente, se define un identificador único del dispositivo a partir de la M
 Como se puede observar, dentro de la función loop() se realiza el mantenimiento de la conexión WiFi, MQTT y las tareas periódicas que se llevan a cabo en la función `on_loop()`.
 
 ## 03_mqtt_lib.ino
-La función de este fichero es establecer la conexión con el broker MQTT, mantener la conexión activa, reconectar si se pierde la WiFi, publicar mensajes y suscribirse a topics para procesar los mensajes entrantes mediante un callback.
+La función de este fichero es establecer la conexión con el broker MQTT, mantener la conexión activa, reconectar si se pierde la WiFi, publicar mensajes y suscribirse a topics para procesar los mensajes entrantes mediante un callback. Además, implementa un mecanismo de **deduplicación de mensajes MQTT** que evita el procesamiento de mensajes duplicados recibidos en una ventana corta de tiempo.
+
+### Deduplicador de Mensajes MQTT
+Para mejorar la robustez del sistema, se ha incorporado un filtro de deduplicación que:
+- Calcula un hash no criptográfico (función `djb2`) sobre la concatenación del topic y el payload.
+- Mantiene un buffer circular de los últimos N hashes (`MQTT_DEDUPE_SIZE = 32`).
+- Descarta mensajes cuyo hash ya se encuentre registrado en el buffer.
+- Reduce reprocesos y falsos disparos causados por retransmisiones del broker o reconexiones de red.
+
+Esta solución consume memoria fija O(N) y tiempo de comprobación proporcional al tamaño del buffer, siendo especialmente adecuada para el perfil limitado del microcontrolador.
+
 ```cpp
 #define MQTT_CONNECTION_RETRIES 3
 PubSubClient mqttClient(espWifiClient);
@@ -346,13 +356,16 @@ La finalidad de este fichero es inicializar los recursos de la ESP32-S3 y dejar 
   ```
   Por último, se dejan apagados los LEDs externos y se apaga el LED de funcionamiento para arrancar en un estado conocido.
 
+## 06_comunicacion_leds.ino
+Este fichero contiene la función `alRecibirMensajePorTopic()`, que se encarga de interpretar los mensajes MQTT recibidos en diferentes topics y controlar los LEDs correspondientes. Reacciona a mensajes de actualización de estado de palets y controla los indicadores visuales del sistema.
+
 ## 02_wifi_lib.ino
 Este fichero tiene como propósito gestionar todo lo relacionado con la conexión WiFi de la ESP32-S3. Específicamente este fichero implementa un módulo de comunicaciones WiFi que lleva a cabo lo siguiente:
 1. Inicializa la interfaz WiFi de la ESP32-S3.
 2. Intenta conectarse a la red configurada en `00_Config.h`.
 3. Reconecta automáticamente si se pierde la conexión en algún punto del proceso.
 4. Gestiona el cliente TCP/IP que usará el broker de comunicación MQTT.
-5. permite usar TLS/SSL si el proyecto lo requiere.
+5. Permite usar TLS/SSL si el proyecto lo requiere.
 
 ```cpp
 #ifdef SSL_ROOT_CA
@@ -384,8 +397,8 @@ Lo que se busca con estas líneas de código es tomar el SSID y la contraseña q
   trace("MAC Address: ");
   traceln(WiFi.macAddress());
   ```
-  Configura la ESP32-S3 como estación WiFi.
-  A continuación, imprime la MAC del dispositivo. Esto se lleva a cabo porque resulta útil al sistema para la depuración del código.
+  Configura la ESP32-S3 como estación WiFi (cliente que se conecta a una red existente, no punto de acceso).
+  A continuación, imprime la MAC del dispositivo. Esto se lleva a cabo porque resulta útil al sistema para la depuración del código y para asignar identificadores únicos en la red MQTT.
 
   ```cpp
   #ifdef SSL_ROOT_CA

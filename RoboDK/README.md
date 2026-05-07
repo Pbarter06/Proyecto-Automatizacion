@@ -1,6 +1,9 @@
 # CÓDIGOS ROBODK
 En esta carpeta se va a proceder a explicar la lógica implementada en los códigos que se ha llevado a cabo para el funcionamiento de la simulación de la celda de trabajo en RoboDK.
 
+## Estructura de Carpetas Importante
+Para que los programas de MQTT funcionen correctamente, **todos los archivos Python (`*.py`) deben estar ubicados en la misma carpeta que el archivo principal de RoboDK (`*.rdk`)**. Aunque los programas se han organizado en subcarpetas dentro de este directorio (como `CINTAS/`, `MQTT/`, `CalidadDeVida/`) por razones de claridad y organización del código, **es obligatorio que el archivo `.rdk` esté en el directorio raíz de RoboDK** para que la simulación pueda encontrar y ejecutar los scripts correctamente.
+
 ## Cintas
 Dentro de la carpeta de cintas se encuentran los códigos de las diferentes cintas que se implementan en la celda de la fábrica. Todas las cintas tienen la misma estructura:
 - `avanceCinta.py`
@@ -93,7 +96,7 @@ Como la estructura aplicada en el programa `resetCinta.py` es equivalente en tod
   INCREMENTO_B = 350
   tipo = RDK.getParam('TipoAzulejo')
   ```
-  - `INCREMENTO_MN = 1680 ` se trata del incremento normal.
+  - `INCREMENTO_MM = 1680 ` se trata del incremento normal.
   - `INCREMENTO_B = 350 ` se trata de un incremento extra para aquellos azulejos defectuosos
 
   Para la detección de azulejos se implementa de la misma manera que en los casos anteriormente comentado.
@@ -235,7 +238,30 @@ Por último, para publicar el mensaje deseado se puede realizar de dos maneras d
   Este parámetro es la base de la comunicación entre MQTT y las cintas.
 
   En conclusión, el script leerMQTTS.py en su mayor porcentaje es equivalente al script leerMQTTB.py excepto por los topics con los que se trabaja y el controlador importado.
- 
+
+## Apilado
+Este script constituye el programa principal del robot colaborativo UR5e, responsable de la primera fase de la automatización: el control de calidad y empaquetado de azulejos. El programa gestiona la secuencia de movimientos del robot para recoger azulejos de la cinta de azulejos (cinta de entrada) y colocarlos en las cajas correspondientes ubicadas en las cintas transportadoras 1 y 2, según el estado del azulejo determinado por el sistema de control de calidad.
+
+El script define y configura:
+- **Robot**: UR5e, la unidad robótica responsable del picking y placing de azulejos.
+- **Herramienta**: SMC ZXP7A01-ZP20U-X1 Vacuum Gripper, garra de vacío con 4 ventosas para asegurar firmeza en el agarre de azulejos.
+- **Targets**: Puntos de paso, picking, placing y posicionamiento que definen la trayectoria del robot.
+- **Frames de referencia**: CintaAzulejos (entrada), CintaCaja1 y CintaCaja2 (salida de cajas con azulejos).
+
+El flujo operacional es el siguiente: el robot se posiciona en punto de paso, realiza una aproximación al azulejo (PrePick), ejecuta el picking, se retrae, se desplaza a la posición de placing en la caja correspondiente (Place1 o Place2), suelta el azulejo, se retrae nuevamente y vuelve al estado de espera. Este ciclo se repite continuamente según el tipo de azulejo recibido por MQTT.
+
+## Paletizado
+Este script constituye el programa principal del robot colaborativo UR30, responsable de la segunda fase de la automatización: el paletizado de cajas llenas. El programa gestiona la secuencia de movimientos del robot para recoger cajas llenas desde las cintas transportadoras 3 y 4 y colocarlas ordenadamente en los palets 1 y 2 destinados a su distribución.
+
+El script define y configura:
+- **Robot**: UR30, la unidad robótica responsable del picking y placing de cajas en palets.
+- **Herramienta**: OnRobot VGP20 Vacuum Gripper, garra de vacío eléctrica con capacidad de carga de 20 Kg.
+- **Programas asociados**: Palet1ON y Palet2ON, que ejecutan secuencias de apilamiento específicas al recibir órdenes del controlador.
+- **Targets**: Puntos de paso, picking, placing y posicionamiento que definen la trayectoria del robot entre las cintas de entrada y los palets.
+- **Frames de referencia**: CintaCaja3 y CintaCaja4 (entrada de cajas), Frame Pallet 1 y Frame Pallet 2 (salida).
+
+El flujo operacional es similar al del UR5e: el robot aguarda en posición de reposo, recibe una orden MQTT indicando el palet destino, se desplaza hacia la caja, realiza picking, se retrae, navega hasta el palet destino, ejecuta el placing siguiendo patrones de apilamiento optimizados, se retrae y retorna a reposo. Los programas Palet1ON y Palet2ON contienen las secuencias específicas de apilamiento para garantizar estabilidad y aprovechamiento del espacio.
+
 ## Calidad de Vida
 Este script se centra en el borrado de todos los azulejos que existan en las tres zonas diferentes de la estación de trabajo de RoboDK.
 Una vez se han realizado las importaciones requeridas por el proceso, además de la conexión al RoboDK, se busca obtener los frames donde buscar azulejos.
