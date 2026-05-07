@@ -277,3 +277,10 @@ for item in lista_caja3:
 Por último, para el borrado de azulejos en el escenario de la herramienta del cobot se ha utilizado una implementación similar. Lo único a destacar es que se recorren todos los objetos -al igual que en los casos anteriores- que se encuentran en la ventosa. 
 
 ## Base de Datos
+Este script permite conectarse a PostgreSQL e insertar un azulejo y una caja llena en sus tablas correspondientes.
+Al igual que en los scripts anteriores, éste también requiere de la importación de la librería aunque en este caso la de PostgreSQL. Luego, para que se pueda conectar y interactuar con RoboDK se abre una conexión con PostgreSQl mediante `psycopg.connect()`. Esta función recibe como parámetros `dbname` como nombre de la base de datos, `user` como usuario de PostgreSQL con su respectiva contraseña. Y cuenta también con un `host` y `port` que hacen referencia al servidor (local) y el puerto etsándar de PostgreSQL respectivamente. Si la conexión funciona, imprime un mensaje de éxito. 
+```sql
+cur = conn.cursor()
+```
+El siguiente paso es crear un cursos. EL cursos es el objeto que permite ejecutar sentencias SQL. Todo lo que se inserte, se borre o se consulte se realiza a través de él.
+Los últimos pasos a realizar son las instrucciones INSERT en la tabla Azulejo y en Caja_Llena
