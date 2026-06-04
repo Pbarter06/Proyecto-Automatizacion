@@ -1,4 +1,4 @@
-# Contenido de RobotController.py
+
 
 def handle_message(mqtt_client, topic, mensaje, RDK):
     print(f"--> Nuevo mensaje en {topic}: {mensaje}")
@@ -9,8 +9,7 @@ def handle_message(mqtt_client, topic, mensaje, RDK):
         print(f"Error: El mensaje '{mensaje}' no es un número. Ignorando orden.")
         return 
         
-    # ¡Líneas de robolink eliminadas! Usamos el RDK que viene por los parámetros.
-
+    
     prog1 = RDK.Item('Palet1OFF')
     prog2 = RDK.Item('Palet2OFF')
 
@@ -22,7 +21,6 @@ def handle_message(mqtt_client, topic, mensaje, RDK):
     
     match tipo:
         case 1:
-            # 1. Comprobamos que el programa existe para evitar fallos
             if not prog1.Valid():
                 print("Error: No se encontró el programa 'Palet1OFF'")
                 return
@@ -36,10 +34,9 @@ def handle_message(mqtt_client, topic, mensaje, RDK):
             RDK.setParam('y3', 0)
             RDK.setParam('z3', 0)
             RDK.setParam('LuzPalet1', 0)
-            
-            # 2. Ejecutamos e imprimimos el resultado
+
             resultado = prog1.RunProgram()
-            if resultado == 1:
+            if resultado == 0:
                 print("Éxito: Programa Palet1OFF iniciado.")
             else:
                 print("Fallo: RoboDK rechazó iniciar el programa. (¿El robot está ocupado?)")
